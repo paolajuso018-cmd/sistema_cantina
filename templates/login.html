@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LA CANTINA | Acceso al sistema</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+
+<body>
+
+    <main class="login-container">
+
+        <section class="login-card">
+
+            <!-- ENCABEZADO Y LOGOTIPO -->
+            <header class="login-header">
+
+                <div class="logo">
+                    <img
+                        src="{{ url_for('static', filename='img/logo_cantina.png') }}"
+                        alt="Logo La Cantina">
+                </div>
+
+            </header>
+
+            <!-- PESTAÑAS -->
+            <div class="login-tabs">
+
+                <button
+                    type="button"
+                    class="tab-active"
+                    id="tabLogin">
+
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Iniciar Sesión
+
+                </button>
+
+                <button
+                    type="button"
+                    class="tab-register"
+                    id="tabRegistro">
+
+                    <i class="bi bi-person-plus"></i>
+                    Registrarse
+
+                </button>
+
+            </div>
+
+            <!-- MENSAJES DE FLASK -->
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% if mensajes %}
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="mensaje {{ categoria }}">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ mensaje }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+
+            <!-- ==================================
+                 FORMULARIO DE INICIO DE SESIÓN
+            =================================== -->
+
+            <div id="vistaLogin">
+
+                <div class="form-header">
+
+                    <h2>Iniciar Sesión</h2>
+
+                    <p>Ingresa tus datos para continuar</p>
+
+                </div>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('login.login') }}"
+                    id="loginForm">
+
+                    <!-- USUARIO -->
+                    <div class="input-group">
+
+                        <span class="input-icon">
+                            <i class="bi bi-person"></i>
+                        </span>
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Usuario"
+                            autocomplete="username"
+                            required
+                            autofocus>
+
+                    </div>
+
+                    <!-- CONTRASEÑA -->
+                    <div class="input-group">
+
+                        <span class="input-icon">
+                            <i class="bi bi-lock"></i>
+                        </span>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Contraseña"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="toggle-password"
+                            data-target="password"
+                            aria-label="Mostrar contraseña">
+
+                            <i class="bi bi-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                    <!-- OPCIONES -->
+                    <div class="login-options">
+
+                        <label class="remember">
+
+                            <input
+                                type="checkbox"
+                                id="recordarme"
+                                name="recordarme">
+
+                            <span>Recordarme</span>
+
+                        </label>
+
+                        <a href="#"
+                           class="forgot-password"
+                           id="forgotPassword">
+
+                            ¿Olvidaste tu contraseña?
+
+                        </a>
+
+                    </div>
+
+                    <!-- BOTÓN INICIAR SESIÓN -->
+                    <button
+                        type="submit"
+                        class="btn-login"
+                        id="btnLogin">
+
+                        <i class="bi bi-box-arrow-in-right"></i>
+
+                        <span>Iniciar Sesión</span>
+
+                    </button>
+
+                </form>
+
+                <!-- REGISTRO INFERIOR -->
+                <section class="registro-section">
+
+                    <div class="registro-titulo">
+
+                        <span></span>
+
+                        <p>¿No tienes una cuenta?</p>
+
+                        <span></span>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-registro"
+                        id="btnRegistroInferior">
+
+                        Regístrate aquí
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </button>
+
+                </section>
+
+            </div>
+
+
+            <!-- ==================================
+                 FORMULARIO DE REGISTRO DE CLIENTE
+            =================================== -->
+
+            <div id="vistaRegistro" hidden>
+
+                <div class="form-header">
+
+                    <h2>Crear Cuenta</h2>
+
+                    <p>Regístrate para formar parte de La Cantina</p>
+
+                </div>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('registro.registrar') }}"
+                    id="registroForm">
+
+                    <!-- NOMBRE COMPLETO -->
+                    <div class="campo-registro">
+
+                        <label for="nombre">
+                            <i class="bi bi-person"></i>
+                            Nombre completo
+                            <b>*</b>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nombre"
+                            name="nombre"
+                            placeholder="Ingresa tu nombre completo"
+                            maxlength="100"
+                            autocomplete="name"
+                            required>
+
+                    </div>
+
+                    <!-- CORREO -->
+                    <div class="campo-registro">
+
+                        <label for="correo">
+                            <i class="bi bi-envelope"></i>
+                            Correo electrónico
+                            <b>*</b>
+                        </label>
+
+                        <input
+                            type="email"
+                            id="correo"
+                            name="correo"
+                            placeholder="correo@ejemplo.com"
+                            maxlength="120"
+                            autocomplete="email"
+                            required>
+
+                    </div>
+
+                    <!-- USUARIO -->
+                    <div class="campo-registro">
+
+                        <label for="nuevo_username">
+                            <i class="bi bi-person-badge"></i>
+                            Nombre de usuario
+                            <b>*</b>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nuevo_username"
+                            name="username"
+                            placeholder="Crea tu nombre de usuario"
+                            maxlength="50"
+                            autocomplete="username"
+                            required>
+
+                    </div>
+
+                    <!-- CONTRASEÑA -->
+                    <div class="campo-registro">
+
+                        <label for="nueva_password">
+                            <i class="bi bi-lock"></i>
+                            Contraseña
+                            <b>*</b>
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="nueva_password"
+                                name="password"
+                                placeholder="Mínimo 8 caracteres"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="nueva_password"
+                                aria-label="Mostrar contraseña">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- CONFIRMAR CONTRASEÑA -->
+                    <div class="campo-registro">
+
+                        <label for="confirmar_password">
+                            <i class="bi bi-shield-lock"></i>
+                            Confirmar contraseña
+                            <b>*</b>
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="confirmar_password"
+                                name="confirmar_password"
+                                placeholder="Repite tu contraseña"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="confirmar_password"
+                                aria-label="Mostrar contraseña">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- TIPO DE CUENTA -->
+                    <div class="campo-registro">
+
+                        <label>
+                            <i class="bi bi-people"></i>
+                            Tipo de cuenta
+                        </label>
+
+                        <input
+                            type="text"
+                            value="Cliente"
+                            class="rol-fijo"
+                            readonly>
+
+                    </div>
+
+                    <!-- INFORMACIÓN -->
+                    <div class="estado-info">
+
+                        <i class="bi bi-info-circle"></i>
+
+                        <span>
+                            Tu cuenta será registrada como
+                            <strong>Cliente</strong>.
+                        </span>
+
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="acciones-registro">
+
+                        <button
+                            type="button"
+                            class="btn-volver"
+                            id="btnVolver">
+
+                            <i class="bi bi-arrow-left"></i>
+
+                            Volver
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn-crear"
+                            id="btnCrear">
+
+                            <i class="bi bi-person-plus"></i>
+
+                            <span>Crear Cuenta</span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- DECORACIÓN INFERIOR -->
+            <footer class="login-footer">
+
+                <span></span>
+
+                <img
+                    src="{{ url_for('static', filename='img/fenix_dorado.png') }}"
+                    alt="Decoración dorada de La Cantina"
+                    class="imagen-fenix">
+
+                <span></span>
+
+            </footer>
+
+            <p class="footer-text">
+                Sistema administrativo de La Cantina
+            </p>
+
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT -->
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+
+</body>
+</html>

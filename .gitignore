@@ -1,0 +1,16 @@
+# Entorno virtual
+venv/
+.venv/
+
+# Archivos privados
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Visual Studio Code
+.vscode/
+
+# Archivos temporales
+*.log

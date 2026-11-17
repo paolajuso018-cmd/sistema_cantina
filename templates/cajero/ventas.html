@@ -1,0 +1,509 @@
+
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}
+Ventas | La Cantina
+{% endblock %}
+
+{% block contenido %}
+
+<div class="ventas-contenedor">
+
+    <!-- ENCABEZADO -->
+    <section class="ventas-encabezado">
+        <div>
+            <span class="etiqueta-seccion">PUNTO DE VENTA</span>
+            <h2>Terminal de ventas</h2>
+            <p>Administra las cuentas, pedidos y cobros de La Cantina.</p>
+        </div>
+
+        <div class="fecha-actual">
+            <i class="bi bi-calendar3"></i>
+            <span id="fechaActual"></span>
+        </div>
+    </section>
+
+    <!-- DISTRIBUCIÓN PRINCIPAL -->
+    <section class="ventas-layout">
+
+        <!-- PANEL DE MESAS Y CUENTAS -->
+        <aside class="panel-cuentas">
+
+            <div class="panel-titulo">
+                <div>
+                    <span class="mini-etiqueta">PUNTO DE VENTA</span>
+                    <h3>Cuentas</h3>
+                </div>
+
+                <span class="contador" id="contadorCuentas">0</span>
+            </div>
+
+            <button type="button"
+                    class="btn-abrir-barra"
+                    id="btnAbrirBarra">
+
+                <i class="bi bi-cup-straw"></i>
+
+                <span>
+                    <strong>Nueva cuenta de barra</strong>
+                    <small>Crear una cuenta para mostrador</small>
+                </span>
+
+                <i class="bi bi-plus-circle"></i>
+            </button>
+
+            <div class="subtitulo-panel">
+                <h4>Mesas</h4>
+                <span>Selecciona una mesa para abrirla</span>
+            </div>
+
+            <div class="lista-mesas" id="listaMesas">
+                <p class="mensaje-carga">Cargando mesas...</p>
+            </div>
+
+            <div class="subtitulo-panel cuentas-abiertas-titulo">
+                <h4>Cuentas abiertas</h4>
+                <span>Pedidos pendientes de cobro</span>
+            </div>
+
+            <div class="lista-cuentas" id="listaCuentas">
+                <p class="mensaje-carga">Cargando cuentas...</p>
+            </div>
+
+        </aside>
+
+
+        <!-- PANEL DE PRODUCTOS -->
+        <section class="panel-menu">
+
+            <div class="menu-encabezado">
+
+                <div>
+                    <span class="mini-etiqueta">NUESTRO MENÚ</span>
+                    <h3>Productos</h3>
+                </div>
+
+                <div class="buscador-productos">
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="search"
+                        id="buscarProducto"
+                        placeholder="Buscar producto..."
+                        autocomplete="off"
+                        aria-label="Buscar productos"
+                    >
+                </div>
+
+            </div>
+
+            <!-- CATEGORÍAS DESDE MYSQL -->
+            <div class="categorias-productos" id="categoriasProductos">
+
+                <button type="button"
+                        class="categoria-btn activa"
+                        data-categoria="todas">
+                    Todos
+                </button>
+
+            </div>
+
+            <!-- PRODUCTOS DESDE MYSQL -->
+            <div class="productos-grid" id="productosGrid">
+
+                <div class="estado-vacio">
+                    <i class="bi bi-cup-hot"></i>
+                    <p>Cargando menú...</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PANEL DE CUENTA ACTIVA -->
+        <aside class="panel-ticket">
+
+            <div class="ticket-encabezado">
+
+                <div>
+                    <span class="mini-etiqueta">ORDEN ACTUAL</span>
+                    <h3>Cuenta activa</h3>
+                </div>
+
+                <span class="estado-cuenta" id="estadoCuenta">
+                    Sin cuenta
+                </span>
+
+            </div>
+
+            <div class="ticket-datos">
+
+                <div>
+                    <span>Folio</span>
+                    <strong id="folioCuenta">---</strong>
+                </div>
+
+                <div>
+                    <span>Tipo</span>
+                    <strong id="tipoCuenta">---</strong>
+                </div>
+
+                <div>
+                    <span>Cliente / mesa</span>
+                    <strong id="clienteCuenta">---</strong>
+                </div>
+
+            </div>
+
+            <!-- DETALLE DE PRODUCTOS -->
+            <div class="ticket-productos" id="ticketProductos">
+
+                <div class="ticket-vacio">
+                    <i class="bi bi-receipt"></i>
+                    <p>Selecciona una cuenta para comenzar.</p>
+                </div>
+
+            </div>
+
+            <!-- TOTALES -->
+            <div class="ticket-resumen">
+
+                <div class="resumen-linea">
+                    <span>Subtotal</span>
+                    <strong id="subtotalCuenta">$0.00</strong>
+                </div>
+
+                <div class="resumen-total">
+                    <span>Total</span>
+                    <strong id="totalCuenta">$0.00</strong>
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="btn-cobrar"
+                    id="btnCobrar"
+                    disabled>
+
+                <i class="bi bi-cash-coin"></i>
+                Cobrar cuenta
+
+            </button>
+
+        </aside>
+
+    </section>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL: ABRIR CUENTA DE MESA
+===================================================== -->
+
+<div class="modal-overlay"
+     id="modalMesa"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="tituloModalMesa">
+
+    <div class="modal-caja">
+
+        <button type="button"
+                class="modal-cerrar"
+                data-cerrar="modalMesa"
+                aria-label="Cerrar modal">
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+        <span class="mini-etiqueta">NUEVA ORDEN</span>
+
+        <h3 id="tituloModalMesa">Abrir cuenta de mesa</h3>
+
+        <p>
+            Selecciona una mesa y registra el nombre del cliente
+            si lo deseas.
+        </p>
+
+        <label for="selectMesa">Mesa</label>
+
+        <select id="selectMesa">
+            <option value="">Selecciona una mesa</option>
+        </select>
+
+        <label for="nombreClienteMesa">
+            Nombre del cliente (opcional)
+        </label>
+
+        <input
+            type="text"
+            id="nombreClienteMesa"
+            placeholder="Nombre del cliente"
+            maxlength="100"
+        >
+
+        <button type="button"
+                class="btn-modal-principal"
+                id="confirmarMesa">
+
+            Abrir cuenta
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL: ABRIR CUENTA DE BARRA
+===================================================== -->
+
+<div class="modal-overlay"
+     id="modalBarra"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="tituloModalBarra">
+
+    <div class="modal-caja">
+
+        <button type="button"
+                class="modal-cerrar"
+                data-cerrar="modalBarra"
+                aria-label="Cerrar modal">
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+        <span class="mini-etiqueta">NUEVA ORDEN</span>
+
+        <h3 id="tituloModalBarra">Cuenta de barra</h3>
+
+        <p>
+            Se generará un folio para identificar esta cuenta.
+        </p>
+
+        <label for="nombreClienteBarra">
+            Nombre del cliente (opcional)
+        </label>
+
+        <input
+            type="text"
+            id="nombreClienteBarra"
+            placeholder="Nombre del cliente"
+            maxlength="100"
+        >
+
+        <button type="button"
+                class="btn-modal-principal"
+                id="confirmarBarra">
+
+            Crear cuenta de barra
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL: COBRO
+===================================================== -->
+
+<div class="modal-overlay"
+     id="modalCobro"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="tituloModalCobro">
+
+    <div class="modal-caja modal-cobro">
+
+        <button type="button"
+                class="modal-cerrar"
+                data-cerrar="modalCobro"
+                aria-label="Cerrar modal">
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+        <span class="mini-etiqueta">FINALIZAR VENTA</span>
+
+        <h3 id="tituloModalCobro">Realizar cobro</h3>
+
+        <div class="total-modal">
+
+            <span>Total a pagar</span>
+
+            <strong id="totalModalCobro">$0.00</strong>
+
+        </div>
+
+        <!-- MÉTODOS DE PAGO -->
+        <div id="listaPagos">
+
+            <div class="fila-pago">
+
+                <label>Método de pago</label>
+
+                <select class="metodo-pago">
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+
+                <label>Monto</label>
+
+                <input
+                    type="number"
+                    class="monto-pago"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                >
+
+                <label>Recibido (solo efectivo)</label>
+
+                <input
+                    type="number"
+                    class="recibido-pago"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                >
+
+            </div>
+
+        </div>
+
+        <button type="button"
+                class="btn-agregar-pago"
+                id="btnAgregarPago">
+
+            <i class="bi bi-plus-circle"></i>
+            Agregar otro método de pago
+
+        </button>
+
+        <!-- RESUMEN DE COBRO -->
+        <div class="cobro-resumen">
+
+            <div>
+                <span>Total registrado</span>
+                <strong id="totalPagado">$0.00</strong>
+            </div>
+
+            <div>
+                <span>Restante</span>
+                <strong id="restantePago">$0.00</strong>
+            </div>
+
+            <div>
+                <span>Cambio estimado</span>
+                <strong id="cambioPago">$0.00</strong>
+            </div>
+
+        </div>
+
+        <button type="button"
+                class="btn-modal-principal"
+                id="confirmarCobro">
+
+            Confirmar cobro
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL: TICKET
+===================================================== -->
+
+<div class="modal-overlay"
+     id="modalTicket"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="tituloModalTicket">
+
+    <div class="modal-caja modal-ticket">
+
+        <button type="button"
+                class="modal-cerrar"
+                data-cerrar="modalTicket"
+                aria-label="Cerrar modal">
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+        <h3 id="tituloModalTicket" class="mini-etiqueta">
+            COMPROBANTE DE VENTA
+        </h3>
+
+        <div id="contenidoTicket"></div>
+
+        <div class="ticket-acciones">
+
+            <button type="button"
+                    class="btn-modal-secundario"
+                    id="cerrarTicket">
+
+                Cerrar
+
+            </button>
+
+            <button type="button"
+                    class="btn-modal-principal"
+                    id="imprimirTicket">
+
+                <i class="bi bi-printer"></i>
+                Imprimir ticket
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- NOTIFICACIONES -->
+<div class="notificacion"
+     id="notificacion"
+     role="status"
+     aria-live="polite">
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+    const URL_PRODUCTOS = "{{ url_for('ventas.api_productos') }}";
+    const URL_CUENTAS = "{{ url_for('ventas.api_cuentas') }}";
+    const URL_ABRIR_CUENTA = "{{ url_for('ventas.abrir_cuenta') }}";
+
+    const URL_DETALLE_CUENTA = "{{ url_for('ventas.detalle_cuenta', id_venta=0) }}";
+
+    const URL_AGREGAR_PRODUCTO = "{{ url_for('ventas.agregar_producto') }}";
+    const URL_ACTUALIZAR_PRODUCTO = "{{ url_for('ventas.actualizar_producto') }}";
+    const URL_COBRAR = "{{ url_for('ventas.cobrar') }}";
+
+    const URL_TICKET = "{{ url_for('ventas.ticket', id_venta=0) }}";
+</script>
+
+<script src="{{ url_for('static', filename='js/cajero/ventas.js') }}"
+        defer>
+</script>
+
+{% endblock %}

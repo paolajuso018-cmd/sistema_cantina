@@ -1,0 +1,591 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}Gestión de Recetas | La Cantina{% endblock %}
+
+{% block contenido %}
+
+<div class="recetas-contenedor">
+
+    <div class="recetas-encabezado">
+        <div class="recetas-titulo">
+            <i class="bi bi-cup-hot"></i>
+            <div>
+                <h1>Gestión de Recetas</h1>
+                <p>Administra las recetas, ingredientes y costos de cada bebida.</p>
+            </div>
+        </div>
+
+        <button class="btn-nueva-receta" id="abrirModalReceta">
+            <i class="bi bi-plus-lg"></i> Nueva Receta
+        </button>
+    </div>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+            <div class="recetas-mensajes">
+                {% for categoria, mensaje in mensajes %}
+                    <div class="mensaje {{ categoria }}">{{ mensaje }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="recetas-estadisticas">
+
+        <div class="tarjeta-receta">
+            <div class="estadistica-icono vino"><i class="bi bi-cup-straw"></i></div>
+            <div>
+                <span>Total de recetas</span>
+                <strong>{{ estadisticas.total }}</strong>
+            </div>
+        </div>
+
+        <div class="tarjeta-receta">
+            <div class="estadistica-icono verde"><i class="bi bi-check-lg"></i></div>
+            <div>
+                <span>Recetas activas</span>
+                <strong>{{ estadisticas.activas }}</strong>
+            </div>
+        </div>
+
+        <div class="tarjeta-receta">
+            <div class="estadistica-icono rojo"><i class="bi bi-x-lg"></i></div>
+            <div>
+                <span>Recetas inactivas</span>
+                <strong>{{ estadisticas.inactivas }}</strong>
+            </div>
+        </div>
+
+        <div class="tarjeta-receta">
+            <div class="estadistica-icono dorado"><i class="bi bi-coin"></i></div>
+            <div>
+                <span>Costo promedio</span>
+                <strong>${{ "%.2f"|format(estadisticas.costo_promedio|float) }}</strong>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="recetas-filtros">
+
+        <div class="buscador-recetas">
+            <i class="bi bi-search"></i>
+            <input type="text" id="buscarReceta"
+                   placeholder="Buscar receta o producto...">
+        </div>
+
+        <label>Categoría:
+            <select id="filtroCategoria">
+                <option value="">Todas</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.nombre }}">
+                        {{ categoria.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>Estado:
+            <select id="filtroEstado">
+                <option value="">Todos</option>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+            </select>
+        </label>
+
+        <button type="button" id="limpiarFiltros" class="btn-limpiar-recetas">
+            <i class="bi bi-arrow-repeat"></i> Limpiar
+        </button>
+
+    </div>
+
+    <div class="recetas-columnas">
+
+        <section class="panel-listado-recetas">
+
+            <div class="tabla-scroll">
+                <table class="tabla-recetas">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Costo</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaRecetas">
+
+                        {% for receta in recetas %}
+
+                        <tr class="fila-receta"
+                            data-nombre="{{ receta.nombre|lower }}"
+                            data-categoria="{{ receta.categoria }}"
+                            data-estado="{{ receta.estado }}"
+                            data-id="{{ receta.id_receta }}">
+
+                            <td>{{ loop.index }}</td>
+
+                            <td>
+                                <button type="button"
+                                        class="seleccionar-receta"
+                                        data-id="{{ receta.id_receta }}">
+                                    {{ receta.nombre }}
+                                </button>
+                            </td>
+
+                            <td>{{ receta.categoria }}</td>
+
+                            <td>
+                                ${{ "%.2f"|format(receta.costo_preparacion|float) }}
+                            </td>
+
+                            <td>
+                                ${{ "%.2f"|format(receta.precio_venta|float) }}
+                            </td>
+
+                            <td>
+                                <div class="estado-acciones">
+
+                                    <span class="estado-receta {{ 'activo' if receta.estado == 'Activo' else 'inactivo' }}">
+                                        {{ receta.estado }}
+                                    </span>
+
+                                    <button type="button"
+                                            class="btn-editar-receta"
+                                            data-id="{{ receta.id_receta }}"
+                                            title="Editar receta">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="6" class="sin-recetas">
+                                Todavía no hay recetas registradas.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+            <div class="pie-listado">
+                Mostrando {{ recetas|length }} recetas
+            </div>
+
+        </section>
+
+
+        <!-- DETALLE DE LA RECETA -->
+
+        <section class="panel-detalle-receta">
+
+            {% if receta_seleccionada %}
+
+                <div class="detalle-encabezado">
+
+                    <div class="detalle-foto">
+
+                        {% if receta_seleccionada.imagen %}
+
+                            <img src="{{ url_for('static', filename=receta_seleccionada.imagen) }}"
+                                 alt="{{ receta_seleccionada.nombre }}">
+
+                        {% else %}
+
+                            <i class="bi bi-cup-straw"></i>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="detalle-informacion">
+
+                        <h2>{{ receta_seleccionada.nombre }}</h2>
+
+                        <p>
+                            Categoría: {{ receta_seleccionada.categoria }}
+                        </p>
+
+                        <p>
+                            Porciones: {{ receta_seleccionada.porciones }}
+                        </p>
+
+                        <p>
+                            Costo de preparación:
+                            <strong>
+                                ${{ "%.2f"|format(receta_seleccionada.costo_preparacion|float) }}
+                            </strong>
+                        </p>
+
+                        <p>
+                            Precio de venta:
+                            <strong>
+                                ${{ "%.2f"|format(receta_seleccionada.precio_venta|float) }}
+                            </strong>
+                        </p>
+
+                        <p>
+                            Utilidad:
+                            <strong>
+                                {{ receta_seleccionada.porcentaje_utilidad }}%
+                            </strong>
+                        </p>
+
+                        <span class="estado-receta {{ 'activo' if receta_seleccionada.estado == 'Activo' else 'inactivo' }}">
+                            {{ receta_seleccionada.estado }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <h3>
+                    <i class="bi bi-layers"></i> Ingredientes
+                </h3>
+
+                <div class="tabla-scroll">
+
+                    <table class="tabla-ingredientes">
+
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Insumo</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Costo</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for ingrediente in ingredientes_seleccionados %}
+
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ ingrediente.insumo }}</td>
+                                <td>
+                                    {{ ingrediente.cantidad_receta or ingrediente.cantidad }}
+                                </td>
+                                <td>
+                                    {{ ingrediente.unidad_receta or '—' }}
+                                </td>
+                                <td>
+                                    ${{ "%.3f"|format(ingrediente.costo_unitario|float) }}
+                                </td>
+                                <td>
+                                    ${{ "%.2f"|format(ingrediente.subtotal|float) }}
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <h3>
+                    <i class="bi bi-journal-text"></i> Instrucciones de preparación
+                </h3>
+
+                <div class="instrucciones-receta">
+                    {{ receta_seleccionada.instrucciones or 'Sin instrucciones registradas.' }}
+                </div>
+
+
+            {% else %}
+
+                <div class="detalle-vacio">
+                    <i class="bi bi-cup-hot"></i>
+                    <h2>Sin recetas registradas</h2>
+                    <p>Registra tu primera receta para ver aquí sus ingredientes y costos.</p>
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================== -->
+<!-- MODAL NUEVA RECETA / EDITAR RECETA -->
+<!-- ===================================== -->
+
+<div class="modal-receta" id="modalNuevaReceta">
+
+    <div class="modal-receta-contenido">
+
+        <div class="modal-receta-encabezado">
+
+            <h2 id="tituloModalReceta">
+                <i class="bi bi-cup-straw"></i> Nueva Receta
+            </h2>
+
+            <button type="button" id="cerrarModalReceta">
+                &times;
+            </button>
+
+        </div>
+
+        <p class="modal-subtitulo">
+            Registra un producto y sus ingredientes.
+        </p>
+
+
+        <form method="POST"
+              action="{{ url_for('recetas.gestionar_recetas') }}"
+              enctype="multipart/form-data"
+              id="formNuevaReceta">
+
+            <input type="hidden"
+                   name="id_receta"
+                   id="idRecetaEditar">
+
+
+            <div class="form-receta-grid">
+
+                <div class="campo-receta">
+                    <label>Código *</label>
+                    <input type="text"
+                           name="codigo"
+                           placeholder="Ej. BEB-001"
+                           required>
+                </div>
+
+
+                <div class="campo-receta">
+                    <label>Nombre del producto *</label>
+                    <input type="text"
+                           name="nombre"
+                           placeholder="Ej. Margarita"
+                           required>
+                </div>
+
+
+                <div class="campo-receta">
+                    <label>Categoría *</label>
+
+                    <select name="id_categoria" required>
+                        <option value="">Selecciona una categoría</option>
+
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id_categoria }}">
+                                {{ categoria.nombre }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+
+                <div class="campo-receta">
+                    <label>Porciones *</label>
+
+                    <input type="number"
+                           name="porciones"
+                           value="1"
+                           min="0.001"
+                           step="0.001"
+                           required>
+                </div>
+
+
+                <div class="campo-receta campo-completo">
+
+                    <label>Fotografía del producto</label>
+
+                    <input type="file"
+                           name="imagen"
+                           id="imagenReceta"
+                           accept=".png,.jpg,.jpeg,.webp">
+
+                    <small>
+                        Formatos permitidos: PNG, JPG, JPEG y WEBP.
+                    </small>
+
+                    <img id="vistaImagenReceta"
+                         class="vista-imagen-receta"
+                         alt="Vista previa"
+                         hidden>
+
+                </div>
+
+
+                <div class="campo-receta campo-completo">
+
+                    <label>Descripción</label>
+
+                    <textarea name="descripcion"
+                              placeholder="Descripción del producto"></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- INGREDIENTES -->
+
+            <div class="seccion-ingredientes">
+
+                <h3>Ingredientes de la receta</h3>
+
+                <div id="listaIngredientes"></div>
+
+                <button type="button"
+                        id="agregarIngrediente"
+                        class="btn-agregar-ingrediente">
+
+                    <i class="bi bi-plus-circle"></i>
+                    Agregar ingrediente
+
+                </button>
+
+            </div>
+
+
+            <!-- INSTRUCCIONES -->
+
+            <div class="campo-receta campo-completo">
+
+                <label>Instrucciones de preparación</label>
+
+                <textarea name="instrucciones"
+                          placeholder="Describe los pasos para preparar la bebida"></textarea>
+
+            </div>
+
+
+            <!-- COSTOS Y UTILIDAD -->
+
+            <div class="calculo-receta">
+
+                <div>
+                    <span>Costo de preparación</span>
+                    <strong id="costoCalculado">$0.00</strong>
+                </div>
+
+
+                <div>
+
+                    <label for="utilidadReceta">
+                        Margen de utilidad (%)
+                    </label>
+
+                    <input type="number"
+                           name="porcentaje_utilidad"
+                           id="utilidadReceta"
+                           value="60"
+                           min="0"
+                           max="99.99"
+                           step="0.01"
+                           required>
+
+                </div>
+
+
+                <div class="precio-calculado">
+
+                    <span>Precio de venta calculado</span>
+                    <strong id="precioCalculado">$0.00</strong>
+
+                </div>
+
+            </div>
+
+
+            <input type="hidden" name="estado" value="Activo">
+
+
+            <!-- BOTONES -->
+
+            <div class="acciones-modal-receta">
+
+                <button type="button"
+                        id="cancelarModalReceta"
+                        class="btn-cancelar-receta">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="btn-guardar-receta"
+                        id="btnGuardarReceta">
+
+                    <i class="bi bi-floppy"></i>
+                    Guardar receta
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================== -->
+<!-- OPCIONES PARA LOS SELECTS DE JAVASCRIPT -->
+<!-- ===================================== -->
+
+<template id="opcionesInsumos">
+
+    {% for insumo in insumos %}
+
+        <option value="{{ insumo.id_insumo }}"
+                data-costo="{{ insumo.costo_unitario }}"
+                data-stock="{{ insumo.stock_actual }}"
+                data-unidad="{{ insumo.id_unidad }}"
+                data-tipo="{{ insumo.tipo_medida }}"
+                data-factor="{{ insumo.factor_conversion }}">
+
+            {{ insumo.nombre }} ({{ insumo.abreviatura }})
+
+        </option>
+
+    {% endfor %}
+
+</template>
+
+
+<template id="opcionesUnidades">
+
+    {% for unidad in unidades %}
+
+        <option value="{{ unidad.id_unidad }}"
+                data-tipo="{{ unidad.tipo_medida }}"
+                data-factor="{{ unidad.factor_conversion }}">
+
+            {{ unidad.nombre }} ({{ unidad.abreviatura }})
+
+        </option>
+
+    {% endfor %}
+
+</template>
+
+
+<script src="{{ url_for('static', filename='js/recetas.js') }}"></script>
+
+{% endblock %}

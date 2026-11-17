@@ -1,0 +1,839 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}Almacén | La Cantina{% endblock %}
+
+{% block contenido %}
+
+<div class="almacen-contenedor">
+
+    <!-- ENCABEZADO -->
+
+    <div class="almacen-encabezado">
+
+        <div class="almacen-titulo">
+
+            <i class="bi bi-box-seam"></i>
+
+            <div>
+                <h1>Almacén - Insumos</h1>
+                <p>
+                    Controla el inventario de los insumos utilizados
+                    en la preparación de bebidas.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="almacen-acciones">
+            <button type="button" class="btn-exportar">
+                <i class="bi bi-download"></i>
+                Exportar
+            </button>
+
+            <button type="button" class="btn-nuevo-insumo" id="abrirModalInsumo">
+                <i class="bi bi-plus-lg"></i>
+                Nuevo Insumo
+            </button>
+        </div>
+
+    </div>
+
+
+    <!-- TARJETAS DE ESTADÍSTICAS -->
+
+    <div class="almacen-estadisticas">
+
+        <div class="tarjeta-stock tarjeta-total">
+            <div class="estadistica-icono">
+                <i class="bi bi-box-seam"></i>
+            </div>
+
+            <div>
+                <span>Total de insumos</span>
+                <strong>{{ estadisticas.total }}</strong>
+            </div>
+
+        </div>
+
+
+        <div class="tarjeta-stock tarjeta-con-stock">
+            <div class="estadistica-icono">
+                <i class="bi bi-check-lg"></i>
+            </div>
+
+            <div>
+                <span>Insumos con stock</span>
+                <strong>{{ estadisticas.con_stock }}</strong>
+            </div>
+
+        </div>
+
+
+        <div class="tarjeta-stock tarjeta-stock-bajo">
+            <div class="estadistica-icono">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+
+            <div>
+                <span>Stock bajo</span>
+                <strong>{{ estadisticas.stock_bajo }}</strong>
+            </div>
+
+        </div>
+
+
+        <div class="tarjeta-stock tarjeta-sin-stock">
+            <div class="estadistica-icono">
+                <i class="bi bi-x-lg"></i>
+            </div>
+
+            <div>
+                <span>Sin stock</span>
+                <strong>{{ estadisticas.sin_stock }}</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTROS -->
+
+    <form method="GET"
+          action="{{ url_for('almacen.inventario') }}"
+          class="almacen-filtros">
+
+        <div class="buscador-insumo">
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                name="buscar"
+                placeholder="Buscar insumo (nombre o código)..."
+                value="{{ busqueda }}">
+        </div>
+
+
+        <label for="filtroCategoria">Categoría:</label>
+
+        <select name="categoria" id="filtroCategoria">
+
+            <option value="">Todas</option>
+
+            {% for categoria in categorias %}
+
+                <option
+                    value="{{ categoria.id_categoria }}"
+                    {% if categoria_seleccionada|string == categoria.id_categoria|string %}
+                        selected
+                    {% endif %}>
+
+                    {{ categoria.nombre }}
+
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <label for="filtroEstado">Estado:</label>
+
+        <select name="estado" id="filtroEstado">
+
+            <option value="">Todos</option>
+
+            <option value="Activo"
+                {% if estado_seleccionado == 'Activo' %}selected{% endif %}>
+                Activos
+            </option>
+
+            <option value="Inactivo"
+                {% if estado_seleccionado == 'Inactivo' %}selected{% endif %}>
+                Inactivos
+            </option>
+
+        </select>
+
+
+        <button type="submit" class="btn-buscar">
+            <i class="bi bi-search"></i>
+            Buscar
+        </button>
+
+
+        <a href="{{ url_for('almacen.inventario') }}"
+           class="btn-limpiar">
+
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Limpiar
+
+        </a>
+
+    </form>
+
+
+    <!-- TABLA DE INSUMOS -->
+
+    <div class="tabla-almacen-contenedor">
+
+        <table class="tabla-almacen">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Insumo</th>
+                    <th>Categoría</th>
+                    <th>Unidad</th>
+                    <th>Stock actual</th>
+                    <th>Stock mínimo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+
+                {% for insumo in insumos %}
+
+                <tr>
+
+                    <td>{{ (pagina - 1) * 8 + loop.index }}</td>
+
+
+                    <td>{{ insumo.codigo }}</td>
+
+                    <td class="nombre-insumo">
+                        {{ insumo.nombre }}
+                    </td>
+
+                    <td>
+                        <span class="categoria-insumo">
+                            {{ insumo.categoria }}
+                        </span>
+                    </td>
+
+                    <td>{{ insumo.abreviatura }}</td>
+
+                    <td class="
+                        {% if insumo.stock_actual <= 0 %}
+                            stock-cero
+                        {% elif insumo.stock_actual <= insumo.stock_minimo %}
+                            stock-alerta
+                        {% endif %}">
+
+                        {{ "%.2f"|format(insumo.stock_actual|float) }}
+
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(insumo.stock_minimo|float) }}
+                    </td>
+
+                    <td>
+
+                        {% if insumo.estado == 'Inactivo' %}
+
+                            <span class="estado-insumo inactivo">
+                                Inactivo
+                            </span>
+
+                        {% elif insumo.estado_stock == 'Sin stock' %}
+
+                            <span class="estado-insumo sin-stock">
+                                Sin stock
+                            </span>
+
+                        {% elif insumo.estado_stock == 'Stock bajo' %}
+
+                            <span class="estado-insumo bajo">
+                                Stock bajo
+                            </span>
+
+                        {% else %}
+
+                            <span class="estado-insumo activo">
+                                Activo
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="acciones-insumo">
+
+                            <button
+                                type="button"
+                                class="btn-editar-insumo"
+                                data-id="{{ insumo.id_insumo }}"
+                                title="Editar insumo">
+
+                                <i class="bi bi-pencil-fill"></i>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn-movimiento-insumo"
+                                data-id="{{ insumo.id_insumo }}"
+                                title="Registrar movimiento">
+
+                                <i class="bi bi-box-seam"></i>
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn-eliminar-insumo"
+                                data-id="{{ insumo.id_insumo }}"
+                                title="Desactivar insumo">
+
+                                <i class="bi bi-trash-fill"></i>
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="10" class="sin-resultados">
+                        <i class="bi bi-inbox"></i>
+                        No se encontraron insumos.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- PAGINACIÓN -->
+
+    <div class="paginacion-almacen">
+
+        <span>
+            Mostrando
+            {{ (pagina - 1) * 8 + (1 if total_registros > 0 else 0) }}
+            a
+            {{ (pagina - 1) * 8 + insumos|length }}
+            de {{ total_registros }} insumos
+        </span>
+
+
+        <div class="paginacion-botones">
+
+            <a href="{{ url_for(
+                'almacen.inventario',
+                buscar=busqueda,
+                categoria=categoria_seleccionada,
+                estado=estado_seleccionado,
+                pagina=1
+            ) }}"
+            class="{% if pagina == 1 %}deshabilitado{% endif %}">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+
+
+            <a href="{{ url_for(
+                'almacen.inventario',
+                buscar=busqueda,
+                categoria=categoria_seleccionada,
+                estado=estado_seleccionado,
+                pagina=pagina-1
+            ) }}"
+            class="{% if pagina == 1 %}deshabilitado{% endif %}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+
+
+            <span class="pagina-actual">
+                {{ pagina }}
+            </span>
+
+
+            <a href="{{ url_for(
+                'almacen.inventario',
+                buscar=busqueda,
+                categoria=categoria_seleccionada,
+                estado=estado_seleccionado,
+                pagina=pagina+1
+            ) }}"
+            class="{% if pagina >= total_paginas %}deshabilitado{% endif %}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+
+
+            <a href="{{ url_for(
+                'almacen.inventario',
+                buscar=busqueda,
+                categoria=categoria_seleccionada,
+                estado=estado_seleccionado,
+                pagina=total_paginas
+            ) }}"
+            class="{% if pagina >= total_paginas %}deshabilitado{% endif %}">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     MODAL: NUEVO INSUMO
+========================================== -->
+
+<div class="modal-overlay" id="modalNuevoInsumo">
+
+    <div class="modal-insumo">
+
+        <!-- ENCABEZADO -->
+        <div class="modal-insumo-header">
+
+            <h2>
+                <i class="bi bi-box-seam"></i>
+                Nuevo Insumo
+            </h2>
+
+            <button type="button" class="cerrar-modal" id="cerrarModalInsumo">
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+        </div>
+
+        <!-- CUERPO -->
+        <div class="modal-insumo-body">
+
+            <p class="modal-descripcion">
+                Registra un nuevo insumo en el inventario.
+            </p>
+
+            <form id="formNuevoInsumo"
+                  method="POST"
+                  action="{{ url_for('almacen.nuevo_insumo') }}">
+
+                <div class="form-insumo-grid">
+
+                    <!-- CÓDIGO -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-upc"></i>
+                            Código *
+                        </label>
+
+                        <input type="text"
+                               name="codigo"
+                               placeholder="Ej. INS-009"
+                               required>
+                    </div>
+
+                    <!-- NOMBRE -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-box-seam"></i>
+                            Nombre del insumo *
+                        </label>
+
+                        <input type="text"
+                               name="nombre"
+                               placeholder="Ej. Limón"
+                               required>
+                    </div>
+
+                    <!-- CATEGORÍA -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-layers"></i>
+                            Categoría *
+                        </label>
+
+                        <select name="id_categoria" required>
+                            <option value="">Selecciona una categoría</option>
+
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria.id_categoria }}">
+                                    {{ categoria.nombre }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <!-- UNIDAD -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-speedometer2"></i>
+                            Unidad de medida *
+                        </label>
+
+                        <select name="id_unidad" required>
+                            <option value="">Selecciona una unidad</option>
+
+                            {% for unidad in unidades %}
+                                <option value="{{ unidad.id_unidad }}">
+                                    {{ unidad.nombre }} ({{ unidad.abreviatura }})
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+                    <div class="campo-insumo campo-completo">
+                        <label>
+                            <i class="bi bi-file-text"></i>
+                            Descripción
+                        </label>
+
+                        <textarea name="descripcion"
+                                  rows="3"
+                                  placeholder="Describe el insumo (opcional)"></textarea>
+                    </div>
+
+                    <!-- COSTO -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-coin"></i>
+                            Costo unitario *
+                        </label>
+
+                        <input type="number"
+                               name="costo_unitario"
+                               min="0"
+                               step="0.001"
+                               placeholder="$ 0.000"
+                               required>
+                    </div>
+
+                    <!-- STOCK ACTUAL -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-boxes"></i>
+                            Stock actual *
+                        </label>
+
+                        <input type="number"
+                               name="stock_actual"
+                               min="0"
+                               step="0.001"
+                               placeholder="0.000"
+                               required>
+                    </div>
+
+                    <!-- STOCK MÍNIMO -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Stock mínimo *
+                        </label>
+
+                        <input type="number"
+                               name="stock_minimo"
+                               min="0"
+                               step="0.001"
+                               placeholder="0.000"
+                               required>
+                    </div>
+
+                    <!-- ESTADO -->
+                    <div class="campo-insumo">
+                        <label>
+                            <i class="bi bi-power"></i>
+                            Estado *
+                        </label>
+
+                        <div class="opciones-estado">
+
+                            <label class="estado-opcion activo">
+                                <input type="radio"
+                                       name="estado"
+                                       value="Activo"
+                                       checked>
+                                <span>Activo</span>
+                            </label>
+
+                            <label class="estado-opcion inactivo">
+                                <input type="radio"
+                                       name="estado"
+                                       value="Inactivo">
+                                <span>Inactivo</span>
+                            </label>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- DECORACIÓN -->
+                <div class="separador-insumo">
+                </div>
+
+                <!-- BOTONES -->
+                <div class="botones-modal-insumo">
+
+                    <button type="button"
+                            class="btn-cancelar-insumo"
+                            id="cancelarModalInsumo">
+                        <i class="bi bi-x-lg"></i>
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn-guardar-insumo">
+                        <i class="bi bi-floppy"></i>
+                        Guardar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     MODAL EDITAR INSUMO
+========================================== -->
+
+<div class="modal-overlay" id="modalEditarInsumo">
+    <div class="modal-insumo">
+
+        <div class="modal-insumo-header">
+            <h2><i class="bi bi-pencil-square"></i> Editar Insumo</h2>
+            <button type="button" class="cerrar-modal" data-cerrar="modalEditarInsumo">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-insumo-body">
+            <p class="modal-descripcion">Modifica la información del insumo.</p>
+
+            <form id="formEditarInsumo">
+                <div class="form-insumo-grid">
+
+                    <div class="campo-insumo">
+                        <label>Código *</label>
+                        <input type="text" name="codigo" id="editarCodigo" required>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Nombre del insumo *</label>
+                        <input type="text" name="nombre" id="editarNombre" required>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Categoría *</label>
+                        <select name="id_categoria" id="editarCategoria" required>
+                            <option value="">Selecciona una categoría</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria.id_categoria }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Unidad de medida *</label>
+                        <select name="id_unidad" id="editarUnidad" required>
+                            <option value="">Selecciona una unidad</option>
+                            {% for unidad in unidades %}
+                                <option value="{{ unidad.id_unidad }}">
+                                    {{ unidad.nombre }} ({{ unidad.abreviatura }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="campo-insumo campo-completo">
+                        <label>Descripción</label>
+                        <textarea name="descripcion" id="editarDescripcion" rows="3"></textarea>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Costo unitario *</label>
+                        <input type="number" name="costo_unitario"
+                               id="editarCosto" min="0" step="0.001" required>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Stock actual</label>
+                        <input type="text" id="editarStockActual" readonly>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Stock mínimo *</label>
+                        <input type="number" name="stock_minimo"
+                               id="editarStockMinimo" min="0" step="0.001" required>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Estado *</label>
+                        <div class="opciones-estado">
+                            <label class="estado-opcion activo">
+                                <input type="radio" name="estado" value="Activo" id="editarActivo">
+                                <span>Activo</span>
+                            </label>
+                            <label class="estado-opcion inactivo">
+                                <input type="radio" name="estado" value="Inactivo" id="editarInactivo">
+                                <span>Inactivo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="separador-insumo">
+                    <span></span><i class="bi bi-hat-wizard"></i><span></span>
+                </div>
+
+                <div class="botones-modal-insumo">
+                    <button type="button" class="btn-cancelar-insumo" data-cerrar="modalEditarInsumo">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn-guardar-insumo">
+                        <i class="bi bi-floppy"></i> Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==========================================
+     MODAL MOVIMIENTO DE INVENTARIO
+========================================== -->
+
+<div class="modal-overlay" id="modalMovimientoInsumo">
+    <div class="modal-insumo modal-movimiento">
+
+        <div class="modal-insumo-header">
+            <h2><i class="bi bi-box-seam"></i> Movimiento de Inventario</h2>
+            <button type="button" class="cerrar-modal" data-cerrar="modalMovimientoInsumo">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-insumo-body">
+            <p class="modal-descripcion" id="nombreMovimiento">
+                Registra un movimiento del insumo.
+            </p>
+
+            <form id="formMovimientoInsumo">
+
+                <div class="form-insumo-grid">
+
+                    <div class="campo-insumo campo-completo">
+                        <label>Tipo de movimiento *</label>
+                        <select name="tipo_movimiento" id="tipoMovimiento" required>
+                            <option value="">Selecciona el movimiento</option>
+                            <option value="Entrada">Entrada - Agregar existencias</option>
+                            <option value="Salida">Salida - Retirar existencias</option>
+                            <option value="Ajuste">Ajuste - Establecer stock físico</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label>Stock actual</label>
+                        <input type="text" id="movimientoStockActual" readonly>
+                    </div>
+
+                    <div class="campo-insumo">
+                        <label id="etiquetaCantidad">Cantidad *</label>
+                        <input type="number" name="cantidad" id="cantidadMovimiento"
+                               min="0.001" step="0.001" required>
+                    </div>
+
+                    <div class="campo-insumo campo-completo">
+                        <label>Motivo *</label>
+                        <textarea name="motivo" rows="3"
+                                  placeholder="Describe el motivo del movimiento"
+                                  required></textarea>
+                    </div>
+
+                </div>
+
+                <div class="separador-insumo">
+                    <span></span><i class="bi bi-hat-wizard"></i><span></span>
+                </div>
+
+                <div class="botones-modal-insumo">
+                    <button type="button" class="btn-cancelar-insumo" data-cerrar="modalMovimientoInsumo">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn-guardar-insumo">
+                        <i class="bi bi-check-circle"></i> Registrar movimiento
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==========================================
+     MODAL CONFIRMAR DESACTIVACIÓN
+========================================== -->
+
+<div class="modal-overlay" id="modalDesactivarInsumo">
+    <div class="modal-insumo modal-confirmacion">
+
+        <div class="modal-insumo-header">
+            <h2><i class="bi bi-exclamation-triangle"></i> Desactivar Insumo</h2>
+            <button type="button" class="cerrar-modal" data-cerrar="modalDesactivarInsumo">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-insumo-body">
+            <p class="modal-descripcion">
+                ¿Estás segura de que deseas desactivar este insumo?
+            </p>
+
+            <p id="nombreDesactivar" class="nombre-confirmacion"></p>
+
+            <p class="texto-confirmacion">
+                El insumo dejará de estar activo, pero se conservará su registro
+                y su historial de movimientos.
+            </p>
+
+            <div class="botones-modal-insumo">
+                <button type="button" class="btn-cancelar-insumo" data-cerrar="modalDesactivarInsumo">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-guardar-insumo btn-desactivar-confirmar"
+                        id="confirmarDesactivar">
+                    <i class="bi bi-trash"></i> Desactivar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- NOTIFICACIONES DEL ALMACÉN -->
+<div id="notificacionAlmacen" class="notificacion-almacen"></div>
+
+
+<script src="{{ url_for('static', filename='js/almacen.js') }}"></script>
+
+{% endblock %}

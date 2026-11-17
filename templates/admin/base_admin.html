@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block titulo %}Panel | La Cantina{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/usuarios.css') }}">
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/almacen.css') }}">
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/recetas.css') }}">
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/cajero/ventas.css') }}">
+
+    {% block estilos %}{% endblock %}
+
+        <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/cajero/ventas.css') }}">
+
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- BARRA LATERAL -->
+        <aside class="sidebar" id="sidebar">
+
+            <div class="logo-admin">
+
+                <img
+                    src="{{ url_for('static', filename='img/logo_portada.png') }}"
+                    alt="La Cantina"
+                >
+
+            </div>
+
+            <div class="menu-contenedor">
+
+                <p class="menu-titulo">MENÚ PRINCIPAL</p>
+
+                <nav class="menu-admin">
+
+                   
+                {% for elemento in menu %}
+
+                    {% set endpoint_actual = request.endpoint %}
+
+                    <a href="{% if elemento.nombre == 'Inicio' %}
+                                    {{ url_for('administrativo.dashboard') }}
+                                {% elif elemento.nombre == 'Usuarios' %}
+                                    {{ url_for('usuarios.gestionar_usuarios') }}
+                                {% elif elemento.nombre == 'Almacén' %}
+                                    {{ url_for('almacen.inventario') }}
+                                {% else %}
+                                    {{ elemento.url }}
+                                {% endif %}"
+                    class="menu-enlace
+                    {% if elemento.nombre == 'Inicio' and endpoint_actual == 'administrativo.dashboard' %}
+                        activo
+                    {% elif elemento.nombre == 'Usuarios' and endpoint_actual == 'usuarios.gestionar_usuarios' %}
+                        activo
+                    {% elif elemento.nombre == 'Almacén' and endpoint_actual.startswith('almacen.') %}
+                        activo
+                    {% elif elemento.nombre == 'Recetas' and request.endpoint == 'recetas.gestionar_recetas' %}
+                        activo
+                    {% endif %}">
+
+                        <span class="menu-icono">
+                            <i class="bi {{ elemento.icono }}"></i>
+                        </span>
+
+                        <span>{{ elemento.nombre }}</span>
+
+                    </a>
+
+                {% endfor %}
+
+
+                </nav>
+
+            </div>
+
+            <div class="agave-decorativo">
+
+                <img
+                    src="{{ url_for('static', filename='img/agave_admin.png') }}"
+                    alt=""
+                >
+
+            </div>
+
+        </aside>
+
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="contenido-admin">
+
+            <!-- BARRA SUPERIOR -->
+            <header class="barra-superior">
+
+                <button
+                    type="button"
+                    class="boton-menu"
+                    id="botonMenu"
+                    aria-label="Abrir menú"
+                >
+                    ☰
+                </button>
+
+                <div class="decoracion-superior"></div>
+
+                <div class="perfil-contenedor">
+
+                    <button
+                        type="button"
+                        class="perfil-boton"
+                        id="perfilBoton"
+                    >
+
+                        <span class="perfil-icono">👤</span>
+
+                        <span class="perfil-nombre">
+                            {{ nombre }}
+                        </span>
+
+                        <span>⌄</span>
+
+                    </button>
+
+                    <div class="perfil-menu" id="perfilMenu">
+
+                        <div class="perfil-informacion">
+
+                            <strong>{{ nombre }}</strong>
+
+                            <span>{{ rol }}</span>
+
+                        </div>
+
+                        <a href="#">Mi perfil</a>
+
+                        <a href="{{ url_for('login.cerrar_sesion') }}">
+                            Cerrar sesión
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ÁREA DE TRABAJO -->
+            <main class="contenido-principal">
+
+                {% block contenido %}
+
+                {% endblock %}
+
+            </main>
+
+
+            <!-- DECORACIÓN INFERIOR -->
+            <footer class="decoracion-inferior"></footer>
+
+        </div>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+
+</html>

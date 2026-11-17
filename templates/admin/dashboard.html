@@ -1,0 +1,520 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}
+Panel de administrador | La Cantina
+{% endblock %}
+
+{% block contenido %}
+
+<!-- =====================================
+     BIENVENIDA Y FECHA
+===================================== -->
+
+<section class="dashboard-bienvenida">
+
+    <div class="bienvenida-izquierda">
+
+        <div class="agave-icono">
+            <img
+                src="{{ url_for('static', filename='img/agave_verde.png') }}"
+                alt="Agave verde">
+        </div>
+
+        <div>
+            <h1>¡Bienvenido, {{ nombre }}!</h1>
+            <p>Panel de control general de La Cantina</p>
+        </div>
+
+    </div>
+
+    <div class="fecha-dashboard">
+        <i class="bi bi-calendar3"></i>
+        <span id="fechaActual">Cargando fecha...</span>
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     INDICADORES PRINCIPALES
+===================================== -->
+
+<section class="indicadores-dashboard">
+
+    <!-- VENTAS DEL DÍA -->
+
+    <article class="indicador-card">
+
+        <div class="indicador-icono vino">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+
+        <div class="indicador-informacion">
+
+            <span>Ventas del día</span>
+
+            <h2>
+                ${{ "{:,.2f}".format(indicadores.ventas_dia) }}
+            </h2>
+
+            <small class="indicador-positivo">
+                Ventas completadas hoy
+            </small>
+
+        </div>
+
+        <i class="bi bi-graph-up indicador-decorativo"></i>
+
+    </article>
+
+
+    <!-- PEDIDOS -->
+
+    <article class="indicador-card">
+
+        <div class="indicador-icono dorado">
+            <i class="bi bi-cup-hot"></i>
+        </div>
+
+        <div class="indicador-informacion">
+
+            <span>Pedidos</span>
+
+            <h2>{{ indicadores.pedidos_dia }}</h2>
+
+            <small>Productos solicitados hoy</small>
+
+        </div>
+
+        <i class="bi bi-receipt indicador-decorativo"></i>
+
+    </article>
+
+
+    <!-- RESERVACIONES -->
+
+    <article class="indicador-card">
+
+        <div class="indicador-icono verde">
+            <i class="bi bi-calendar-check"></i>
+        </div>
+
+        <div class="indicador-informacion">
+
+            <span>Reservaciones</span>
+
+            <h2>{{ indicadores.reservaciones_dia }}</h2>
+
+            <small>Reservaciones del día</small>
+
+        </div>
+
+        <i class="bi bi-calendar2-week indicador-decorativo"></i>
+
+    </article>
+
+
+    <!-- INSUMOS EN BAJO STOCK -->
+
+    <article class="indicador-card">
+
+        <div class="indicador-icono morado">
+            <i class="bi bi-box-seam"></i>
+        </div>
+
+        <div class="indicador-informacion">
+
+            <span>Insumos en bajo stock</span>
+
+            <h2>{{ indicadores.insumos_bajo_stock }}</h2>
+
+            <small>Requieren atención</small>
+
+        </div>
+
+        <i class="bi bi-boxes indicador-decorativo"></i>
+
+    </article>
+
+</section>
+
+
+<!-- =====================================
+     CONTENIDO EN DOS COLUMNAS
+===================================== -->
+
+<section class="dashboard-columnas">
+
+
+    <!-- =================================
+         COLUMNA IZQUIERDA
+    ================================== -->
+
+    <div class="dashboard-columna-izquierda">
+
+
+        <!-- =================================
+             VENTAS DE LA SEMANA
+        ================================== -->
+
+        <article class="panel-dashboard panel-grafica">
+
+            <div class="panel-titulo">
+
+                <h2>
+                    <i class="bi bi-bar-chart-line"></i>
+                    Ventas de la semana
+                </h2>
+
+                <span class="periodo-grafica">
+                    Últimos 7 días
+                </span>
+
+            </div>
+
+
+            {% set maximo_grafica = ventas_semana | map(attribute='total') | max if ventas_semana else 0 %}
+
+
+            <div class="grafica-contenedor">
+
+                <!-- VALORES DEL EJE VERTICAL -->
+
+                <div class="grafica-valores">
+
+                    {% for numero in range(7, -1, -1) %}
+
+                        <span>
+                            ${{ "{:,.0f}".format(maximo_grafica * numero / 7) }}
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- GRÁFICA -->
+
+                <div class="grafica">
+
+                    <div class="lineas-grafica">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </div>
+
+
+                    <div class="barras-grafica">
+
+                        {% for venta in ventas_semana %}
+
+                            <div class="barra-grupo">
+
+                                <div
+                                    class="barra"
+                                    style="height: {{ venta['altura'] }}%;"
+                                    title="{{ venta['dia'] }}: ${{ '{:,.2f}'.format(venta['total']) }}">
+                                </div>
+
+                                <span>{{ venta.dia }}</span>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TOTAL SEMANAL -->
+
+            <div class="total-semana">
+
+                Total de los últimos 7 días:
+
+                <strong>
+                    ${{ "{:,.2f}".format(ventas_semana | sum(attribute='total')) }}
+                </strong>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================
+             PRODUCTOS MÁS VENDIDOS
+        ================================== -->
+
+        <article class="panel-dashboard panel-productos">
+
+            <div class="panel-titulo">
+
+                <h2>
+                    <i class="bi bi-award"></i>
+                    Productos más vendidos
+                </h2>
+
+            </div>
+
+
+            {% if productos_vendidos %}
+
+                {% for producto in productos_vendidos %}
+
+                    <div class="producto-ranking">
+
+                        <span class="ranking-numero
+                            {% if loop.index == 1 %}
+                                primero
+                            {% elif loop.index == 2 %}
+                                segundo
+                            {% else %}
+                                tercero
+                            {% endif %}">
+
+                            {{ loop.index }}
+
+                        </span>
+
+
+                        <div class="producto-imagen">
+
+                            <i class="bi bi-cup-straw"></i>
+
+                        </div>
+
+
+                        <strong>
+                            {{ producto.nombre }}
+                        </strong>
+
+
+                        <span class="producto-ventas">
+
+                            {{ producto.cantidad }} unidades
+
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <div class="sin-datos">
+
+                    <i class="bi bi-inbox"></i>
+
+                    <p>
+                        Aún no hay productos vendidos.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </article>
+
+    </div>
+
+
+
+    <!-- =================================
+         COLUMNA DERECHA
+    ================================== -->
+
+    <div class="dashboard-columna-derecha">
+
+
+        <!-- =================================
+             ESTADO DEL ESTABLECIMIENTO
+        ================================== -->
+
+        <article class="panel-dashboard panel-mesas">
+
+            <div class="panel-titulo">
+
+                <h2>
+                    <i class="bi bi-table"></i>
+                    Estado del establecimiento
+                </h2>
+
+            </div>
+
+
+            <div class="estado-mesas">
+
+
+                <!-- MESAS TOTALES -->
+
+                <div class="estado-mesa total">
+
+                    <span>Mesas totales</span>
+
+                    <div>
+
+                        <i class="bi bi-grid-3x3-gap"></i>
+
+                        <strong>
+                            {{ mesas.total }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- MESAS OCUPADAS -->
+
+                <div class="estado-mesa ocupadas">
+
+                    <span>Ocupadas</span>
+
+                    <div>
+
+                        <i class="bi bi-people-fill"></i>
+
+                        <strong>
+                            {{ mesas.ocupadas }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- MESAS DISPONIBLES -->
+
+                <div class="estado-mesa disponibles">
+
+                    <span>Disponibles</span>
+
+                    <div>
+
+                        <i class="bi bi-check-circle"></i>
+
+                        <strong>
+                            {{ mesas.disponibles }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================
+             ACTIVIDAD DEL DÍA
+        ================================== -->
+
+        <article class="panel-dashboard panel-actividad">
+
+            <div class="panel-titulo">
+
+                <h2>
+                    <i class="bi bi-bell"></i>
+                    Actividad del día
+                </h2>
+
+            </div>
+
+
+            <div class="actividad-lista">
+
+
+                {% if actividad %}
+
+                    {% for elemento in actividad %}
+
+                        <div class="actividad-item">
+
+
+                            <!-- ICONO SEGÚN EL MOVIMIENTO -->
+
+                            <span class="actividad-icono
+                                {% if elemento.tipo == 'venta' %}
+                                    correcto
+                                {% elif elemento.tipo == 'reservacion' %}
+                                    reservacion
+                                {% else %}
+                                    stock
+                                {% endif %}">
+
+
+                                {% if elemento.tipo == 'venta' %}
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                {% elif elemento.tipo == 'reservacion' %}
+
+                                    <i class="bi bi-calendar-event"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-box-seam"></i>
+
+                                {% endif %}
+
+                            </span>
+
+
+                            <!-- DESCRIPCIÓN -->
+
+                            <strong>
+                                {{ elemento.mensaje }}
+                            </strong>
+
+
+                            <!-- HORA -->
+
+                            <time>
+                                {{ elemento.hora }} h
+                            </time>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                {% else %}
+
+                    <div class="sin-datos">
+
+                        <i class="bi bi-bell-slash"></i>
+
+                        <p>
+                            No hay actividad registrada hoy.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+        </article>
+
+    </div>
+
+</section>
+
+{% endblock %}

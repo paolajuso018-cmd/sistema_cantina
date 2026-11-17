@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reservar mesa | La Cantina</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/reservaciones.css') }}">
+</head>
+
+<body>
+
+    <!-- NOTIFICACIONES -->
+    <div id="notificacion" class="notificacion">
+        <span id="iconoNotificacion"></span>
+        <span id="textoNotificacion"></span>
+        <button type="button" id="cerrarNotificacion">×</button>
+    </div>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+            <div id="mensajesFlask" style="display:none;">
+                {% for categoria, mensaje in mensajes %}
+                    <div data-tipo="{{ categoria }}">{{ mensaje }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+
+    <main class="pagina-reservaciones">
+
+        <!-- ENCABEZADO -->
+        <header class="encabezado-reservaciones">
+
+            <a href="/" class="logo">
+                <img
+                    src="{{ url_for('static', filename='img/logo_portada.png') }}"
+                    alt="La Cantina"
+                >
+            </a>
+
+        </header>
+
+
+        <!-- TÍTULO -->
+        <section class="contenido-reservaciones">
+
+            <div class="titulo-reservacion">
+                <span>✦</span>
+                <h1>Reservar mesa</h1>
+                <span>✦</span>
+            </div>
+
+            <p class="subtitulo">
+                Completa tus datos, elige la fecha, hora
+                y selecciona tu mesa en el plano del establecimiento.
+            </p>
+
+
+            <!-- FORMULARIO Y PLANO -->
+            <div class="reservacion-contenido">
+
+
+                <!-- DATOS DEL CLIENTE -->
+                <section class="formulario-reserva">
+
+                    <h2>Datos de la reserva</h2>
+
+                    <form id="formReservacion"
+                          method="POST"
+                          action="{{ url_for('reservaciones.index') }}">
+
+                        <label for="nombre">
+                            Nombre completo *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nombre"
+                            name="nombre_cliente"
+                            placeholder="Ingresa tu nombre"
+                            required
+                        >
+
+
+                        <label for="correo">
+                            Correo electrónico *
+                        </label>
+
+                        <input
+                            type="email"
+                            id="correo"
+                            name="correo"
+                            placeholder="ejemplo@correo.com"
+                            required
+                        >
+
+
+                        <label for="telefono">
+                            Teléfono *
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="telefono"
+                            name="telefono"
+                            placeholder="55 1234 5678"
+                            required
+                        >
+
+
+                        <div class="campos-dobles">
+
+                            <div>
+                                <label for="fecha">
+                                    Fecha de la reserva *
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="fecha"
+                                    name="fecha"
+                                    required
+                                >
+                            </div>
+
+                            <div>
+                                <label for="hora">
+                                    Hora *
+                                </label>
+
+                                <select id="hora" name="hora" required>
+
+                                    <option value="">
+                                        Selecciona una hora
+                                    </option>
+
+                                    <option value="13:00">13:00</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="15:00">15:00</option>
+                                    <option value="16:00">16:00</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="18:00">18:00</option>
+                                    <option value="19:00">19:00</option>
+                                    <option value="20:00">20:00</option>
+                                    <option value="21:00">21:00</option>
+                                    <option value="22:00">22:00</option>
+
+                                </select>
+                            </div>
+
+                        </div>
+
+
+                        <label for="personas">
+                            Número de personas *
+                        </label>
+
+                        <select id="personas" name="numero_personas" required>
+
+                            <option value="">
+                                Selecciona
+                            </option>
+
+                            <option value="1">1 persona</option>
+                            <option value="2">2 personas</option>
+                            <option value="3">3 personas</option>
+                            <option value="4">4 personas</option>
+                            <option value="5">5 personas</option>
+                            <option value="6">6 personas</option>
+                            <option value="7">7 personas</option>
+                            <option value="8">8 personas</option>
+
+                        </select>
+
+
+                        <label for="observaciones">
+                            Observaciones (opcional)
+                        </label>
+
+                        <textarea
+                            id="observaciones"
+                            name="observaciones"
+                            placeholder="Ej. Celebración, cumpleaños, aniversario, etc."
+                        ></textarea>
+
+                        <input
+                            type="hidden"
+                            id="id_mesa"
+                            name="id_mesa"
+                        >
+
+                    </form>
+
+                </section>
+
+
+
+                <!-- PLANO DEL ESTABLECIMIENTO -->
+                <section class="plano-reserva">
+
+                    <h2>Selecciona tu mesa</h2>
+
+                    <div class="plano-contenedor">
+
+                        <div class="plano-mapa">
+
+                            <img
+                                src="{{ url_for('static', filename='img/plano_cantina.png') }}"
+                                alt="Plano de La Cantina"
+                                class="imagen-plano"
+                            >
+
+
+                            <!-- MESA 1: 2 PERSONAS -->
+                            <button
+                                type="button"
+                                class="zona-mesa"
+                                data-id="1"
+                                data-mesa="M1"
+                                data-capacidad="2"
+                                aria-label="Mesa M1 para 2 personas">
+                            </button>
+
+
+                            <!-- MESA 2: 4 PERSONAS -->
+                            <button
+                                type="button"
+                                class="zona-mesa"
+                                data-id="2"
+                                data-mesa="M2"
+                                data-capacidad="4"
+                                aria-label="Mesa M2 para 4 personas">
+                            </button>
+
+
+                            <!-- MESA 3: 6 PERSONAS -->
+                            <button
+                                type="button"
+                                class="zona-mesa"
+                                data-id="3"
+                                data-mesa="M3"
+                                data-capacidad="6"
+                                aria-label="Mesa M3 para 6 personas">
+                            </button>
+
+
+                            <!-- MESA 4: 8 PERSONAS -->
+                            <button
+                                type="button"
+                                class="zona-mesa"
+                                data-id="4"
+                                data-mesa="M4"
+                                data-capacidad="8"
+                                aria-label="Mesa M4 para 8 personas">
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LEYENDA -->
+                    <div class="leyenda-mesas">
+
+                        <span>
+                            <i class="disponible"></i>
+                            Disponible
+                        </span>
+
+                        <span>
+                            <i class="seleccionada"></i>
+                            Seleccionada
+                        </span>
+
+                        <span>
+                            <i class="ocupada"></i>
+                            No disponible
+                        </span>
+
+                    </div>
+
+
+                    <p class="mesa-elegida">
+                        Mesa seleccionada:
+                        <strong id="mesaElegida">Ninguna</strong>
+                    </p>
+
+                </section>
+
+            </div>
+
+
+
+            <!-- BOTONES -->
+            <div class="acciones-reserva">
+
+                <a href="/" class="boton-cancelar">
+                    ✕ Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    form="formReservacion"
+                    class="boton-confirmar"
+                >
+                    Confirmar reserva
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/reservaciones.js') }}"></script>
+
+</body>
+</html>

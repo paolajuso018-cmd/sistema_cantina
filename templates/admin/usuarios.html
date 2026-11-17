@@ -1,0 +1,1120 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}
+Gestión de Usuarios | La Cantina
+{% endblock %}
+
+{% block contenido %}
+
+<!-- =====================================
+     ENCABEZADO
+===================================== -->
+
+<section class="usuarios-encabezado">
+
+    <div class="usuarios-titulo">
+
+        <i class="bi bi-people-fill"></i>
+
+        <div>
+            <h1>Gestión de Usuarios</h1>
+            <p>Administra los usuarios del sistema, sus roles y permisos.</p>
+        </div>
+
+    </div>
+
+    <button type="button"
+        class="btn-nuevo-usuario"
+        id="abrirModalUsuario">
+
+        <i class="bi bi-person-plus-fill"></i>
+        Nuevo Usuario
+
+    </button>
+
+</section>
+
+
+<!-- =====================================
+     TARJETAS DE ESTADÍSTICAS
+===================================== -->
+
+<section class="usuarios-estadisticas">
+
+    <article class="usuario-stat-card stat-total">
+
+        <div class="stat-icono">
+            <i class="bi bi-people-fill"></i>
+        </div>
+
+        <div>
+            <span>Total de usuarios</span>
+            <h2>{{ estadisticas.total }}</h2>
+        </div>
+
+        <i class="bi bi-people stat-decorativo"></i>
+
+    </article>
+
+
+    <article class="usuario-stat-card stat-activos">
+
+        <div class="stat-icono">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+
+        <div>
+            <span>Usuarios activos</span>
+            <h2>{{ estadisticas.activos }}</h2>
+        </div>
+
+        <i class="bi bi-person-check stat-decorativo"></i>
+
+    </article>
+
+
+    <article class="usuario-stat-card stat-inactivos">
+
+        <div class="stat-icono">
+            <i class="bi bi-x-circle-fill"></i>
+        </div>
+
+        <div>
+            <span>Usuarios inactivos</span>
+            <h2>{{ estadisticas.inactivos }}</h2>
+        </div>
+
+        <i class="bi bi-person-x stat-decorativo"></i>
+
+    </article>
+
+
+    <article class="usuario-stat-card stat-roles">
+
+        <div class="stat-icono">
+            <i class="bi bi-person-gear"></i>
+        </div>
+
+        <div>
+            <span>Roles registrados</span>
+            <h2>{{ estadisticas.roles }}</h2>
+        </div>
+
+        <i class="bi bi-gear stat-decorativo"></i>
+
+    </article>
+
+</section>
+
+
+<!-- =====================================
+     BUSCADOR Y FILTROS
+===================================== -->
+
+<form method="GET"
+      action="{{ url_for('usuarios.gestionar_usuarios') }}"
+      class="usuarios-filtros">
+
+    <div class="usuario-buscador">
+
+        <i class="bi bi-search"></i>
+
+        <input
+            type="text"
+            name="busqueda"
+            value="{{ busqueda }}"
+            placeholder="Buscar usuario (nombre, usuario o correo)...">
+
+    </div>
+
+
+    <div class="filtro-campo">
+
+        <label for="filtroRol">Rol:</label>
+
+        <select name="rol" id="filtroRol">
+
+            <option value="">Todos</option>
+
+            {% for rol in roles %}
+
+                <option
+                    value="{{ rol.id_rol }}"
+                    {% if rol_filtro|string == rol.id_rol|string %}
+                        selected
+                    {% endif %}>
+
+                    {{ rol.nombre }}
+
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+
+    <div class="filtro-campo">
+
+        <label for="filtroEstado">Estado:</label>
+
+        <select name="estado" id="filtroEstado">
+
+            <option value="">Todos</option>
+
+            <option value="Activo"
+                {% if estado_filtro == 'Activo' %}selected{% endif %}>
+                Activo
+            </option>
+
+            <option value="Inactivo"
+                {% if estado_filtro == 'Inactivo' %}selected{% endif %}>
+                Inactivo
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <button type="submit" class="btn-buscar-usuarios">
+        <i class="bi bi-search"></i>
+        Buscar
+    </button>
+
+
+    <a href="{{ url_for('usuarios.gestionar_usuarios') }}"
+       class="btn-limpiar-usuarios">
+
+        <i class="bi bi-arrow-counterclockwise"></i>
+        Limpiar
+
+    </a>
+
+</form>
+
+
+<!-- =====================================
+     TABLA DE USUARIOS
+===================================== -->
+
+<section class="usuarios-tabla-contenedor">
+
+    <div class="tabla-scroll">
+
+        <table class="tabla-usuarios">
+
+            <thead>
+
+                <tr>
+                    <th>#</th>
+                    <th>Usuario</th>
+                    <th>Nombre completo</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Fecha de registro</th>
+                    <th>Acciones</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% if usuarios %}
+
+                    {% for usuario in usuarios %}
+
+                        <tr>
+
+                            <td class="numero-fila">
+                                {{ (pagina - 1) * 7 + loop.index }}
+                            </td>
+
+
+                            <!-- USUARIO -->
+
+                            <td>
+
+                                <div class="usuario-identidad">
+
+                                    <div class="usuario-avatar">
+
+                                        {% if usuario.rol == 'Estudiante' %}
+                                            <i class="bi bi-mortarboard-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-person-fill"></i>
+                                        {% endif %}
+
+                                    </div>
+
+                                    <strong>
+                                        {{ usuario.username }}
+                                    </strong>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- NOMBRE -->
+
+                            <td class="nombre-usuario">
+                                {{ usuario.nombre }}
+                            </td>
+
+
+                            <!-- CORREO -->
+
+                            <td class="correo-usuario">
+                                {{ usuario.correo }}
+                            </td>
+
+
+                            <!-- ROL -->
+
+                            <td>
+
+                                <span class="etiqueta-rol
+                                    {% if usuario.rol == 'Administrador' %}
+                                        rol-admin
+                                    {% elif usuario.rol == 'Gerente' %}
+                                        rol-gerente
+                                    {% elif usuario.rol == 'Cajero' %}
+                                        rol-cajero
+                                    {% elif usuario.rol == 'Bartender' %}
+                                        rol-bartender
+                                    {% elif usuario.rol == 'Mesero' %}
+                                        rol-mesero
+                                    {% elif usuario.rol == 'Recepcionista' %}
+                                        rol-recepcionista
+                                    {% else %}
+                                        rol-estudiante
+                                    {% endif %}">
+
+                                    {% if usuario.rol == 'Administrador' %}
+                                        <i class="bi bi-crown-fill"></i>
+                                    {% elif usuario.rol == 'Gerente' %}
+                                        <i class="bi bi-bar-chart-fill"></i>
+                                    {% elif usuario.rol == 'Cajero' %}
+                                        <i class="bi bi-cash-register"></i>
+                                    {% elif usuario.rol == 'Bartender' %}
+                                        <i class="bi bi-cup-straw"></i>
+                                    {% elif usuario.rol == 'Mesero' %}
+                                        <i class="bi bi-person-badge-fill"></i>
+                                    {% elif usuario.rol == 'Recepcionista' %}
+                                        <i class="bi bi-bell-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-mortarboard-fill"></i>
+                                    {% endif %}
+
+                                    {{ usuario.rol }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- ESTADO -->
+
+                            <td>
+
+                                <span class="estado-usuario
+                                    {% if usuario.estado == 'Activo' %}
+                                        estado-activo
+                                    {% else %}
+                                        estado-inactivo
+                                    {% endif %}">
+
+                                    {{ usuario.estado or 'Sin estado' }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- FECHA -->
+
+                            <td class="fecha-usuario">
+
+                                {% if usuario.fecha_registro %}
+                                    {{ usuario.fecha_registro.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                            </td>
+
+
+                            
+                            <!-- ACCIONES -->
+
+                            <td>
+
+                                <div class="acciones-usuario">
+
+                                    <!-- EDITAR -->
+
+                                    <button
+                                        type="button"
+                                        class="btn-editar-usuario btn-abrir-edicion"
+
+                                        data-id="{{ usuario.id_usuario }}"
+                                        data-nombre="{{ usuario.nombre }}"
+                                        data-correo="{{ usuario.correo }}"
+                                        data-username="{{ usuario.username }}"
+                                        data-rol="{{ usuario.id_rol }}"
+                                        data-estado="{{ usuario.estado }}"
+
+                                        title="Editar usuario">
+
+                                        <i class="bi bi-pencil-fill"></i>
+
+                                    </button>
+
+
+                                    <!-- ELIMINAR / DESACTIVAR -->
+
+                                    {% if usuario.id_usuario != session.get('id_usuario') %}
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('usuarios.eliminar_usuario', id_usuario=usuario.id_usuario) }}"
+                                            class="form-eliminar-usuario"
+                                            data-username="{{ usuario.username }}">
+
+                                            <button
+                                                type="submit"
+                                                class="btn-eliminar-usuario"
+                                                title="Desactivar usuario">
+
+                                                <i class="bi bi-trash-fill"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    {% else %}
+
+                                        <button
+                                            type="button"
+                                            class="btn-eliminar-usuario"
+                                            disabled
+                                            title="No puedes desactivar tu propia cuenta">
+
+                                            <i class="bi bi-trash-fill"></i>
+
+                                        </button>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+
+                        </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+                        <td colspan="8" class="tabla-sin-resultados">
+
+                            <i class="bi bi-person-exclamation"></i>
+
+                            <p>No se encontraron usuarios.</p>
+
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =================================
+         PIE Y PAGINACIÓN
+    ================================== -->
+
+    <div class="usuarios-paginacion">
+
+        <span class="texto-paginacion">
+
+            {% if total_filtrados > 0 %}
+
+                Mostrando
+                a
+                {{ [(pagina * 7), total_filtrados] | min }}
+                de
+                {{ total_filtrados }} usuarios
+
+            {% else %}
+
+                No hay usuarios para mostrar
+
+            {% endif %}
+
+        </span>
+
+
+        <div class="botones-paginacion">
+
+            <a href="{{ url_for(
+                'usuarios.gestionar_usuarios',
+                busqueda=busqueda,
+                rol=rol_filtro,
+                estado=estado_filtro,
+                pagina=1
+            ) }}"
+               class="pagina-btn"
+               title="Primera página">
+
+                <i class="bi bi-chevron-double-left"></i>
+
+            </a>
+
+
+            <a href="{{ url_for(
+                'usuarios.gestionar_usuarios',
+                busqueda=busqueda,
+                rol=rol_filtro,
+                estado=estado_filtro,
+                pagina=[pagina - 1, 1] | max
+            ) }}"
+               class="pagina-btn"
+               title="Página anterior">
+
+                <i class="bi bi-chevron-left"></i>
+
+            </a>
+
+
+            {% for numero in range(1, total_paginas + 1) %}
+
+                {% if numero <= 4 or numero == pagina %}
+
+                    <a href="{{ url_for(
+                        'usuarios.gestionar_usuarios',
+                        busqueda=busqueda,
+                        rol=rol_filtro,
+                        estado=estado_filtro,
+                        pagina=numero
+                    ) }}"
+                       class="pagina-btn {% if pagina == numero %}pagina-activa{% endif %}">
+
+                        {{ numero }}
+
+                    </a>
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            <a href="{{ url_for(
+                'usuarios.gestionar_usuarios',
+                busqueda=busqueda,
+                rol=rol_filtro,
+                estado=estado_filtro,
+                pagina=[pagina + 1, total_paginas] | min
+            ) }}"
+               class="pagina-btn"
+               title="Página siguiente">
+
+                <i class="bi bi-chevron-right"></i>
+
+            </a>
+
+
+            <a href="{{ url_for(
+                'usuarios.gestionar_usuarios',
+                busqueda=busqueda,
+                rol=rol_filtro,
+                estado=estado_filtro,
+                pagina=total_paginas
+            ) }}"
+               class="pagina-btn"
+               title="Última página">
+
+                <i class="bi bi-chevron-double-right"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     MODAL NUEVO USUARIO
+===================================== -->
+
+<div class="modal-usuario-overlay" id="modalUsuario">
+
+    <div class="modal-usuario">
+
+        <!-- ENCABEZADO -->
+
+        <div class="modal-usuario-header">
+
+            <h2>
+                <i class="bi bi-person-plus-fill"></i>
+                Nuevo Usuario
+            </h2>
+
+            <button type="button"
+                    class="cerrar-modal-usuario"
+                    id="cerrarModalUsuario"
+                    aria-label="Cerrar">
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- FORMULARIO -->
+
+        <form method="POST"
+              action="{{ url_for('usuarios.nuevo_usuario') }}"
+              id="formNuevoUsuario">
+
+            <div class="modal-usuario-contenido">
+
+                <p class="modal-descripcion">
+                    Registra un nuevo usuario en el sistema.
+                </p>
+
+
+                <div class="formulario-usuario-grid">
+
+                    <!-- NOMBRE COMPLETO -->
+
+                    <div class="campo-usuario">
+
+                        <label for="nuevoNombre">
+                            <i class="bi bi-person-fill"></i>
+                            Nombre completo <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nuevoNombre"
+                            name="nombre"
+                            placeholder="Ingresa el nombre completo"
+                            maxlength="100"
+                            required>
+
+                    </div>
+
+
+                    <!-- ROL -->
+
+                    <div class="campo-usuario">
+
+                        <label for="nuevoRol">
+                            <i class="bi bi-people-fill"></i>
+                            Rol <span>*</span>
+                        </label>
+
+                        <select
+                            id="nuevoRol"
+                            name="id_rol"
+                            required>
+
+                            <option value="">Selecciona un rol</option>
+
+                            {% for rol in roles %}
+
+                                <option value="{{ rol.id_rol }}">
+                                    {{ rol.nombre }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CORREO -->
+
+                    <div class="campo-usuario">
+
+                        <label for="nuevoCorreo">
+                            <i class="bi bi-envelope"></i>
+                            Correo electrónico <span>*</span>
+                        </label>
+
+                        <input
+                            type="email"
+                            id="nuevoCorreo"
+                            name="correo"
+                            placeholder="ejemplo@correo.com"
+                            maxlength="120"
+                            required>
+
+                    </div>
+
+
+                    <!-- ESTADO -->
+
+                    <div class="campo-usuario">
+
+                        <label>
+                            <i class="bi bi-power"></i>
+                            Estado
+                        </label>
+
+                        <div class="opciones-estado">
+
+                            <label class="opcion-estado activo-seleccionado">
+
+                                <input
+                                    type="radio"
+                                    name="estado"
+                                    value="Activo"
+                                    checked>
+
+                                <span class="radio-personalizado"></span>
+                                Activo
+
+                            </label>
+
+
+                            <label class="opcion-estado">
+
+                                <input
+                                    type="radio"
+                                    name="estado"
+                                    value="Inactivo">
+
+                                <span class="radio-personalizado"></span>
+                                Inactivo
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- NOMBRE DE USUARIO -->
+
+                    <div class="campo-usuario">
+
+                        <label for="nuevoUsername">
+                            <i class="bi bi-person-vcard-fill"></i>
+                            Nombre de usuario <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nuevoUsername"
+                            name="username"
+                            placeholder="Ingresa el nombre de usuario"
+                            maxlength="50"
+                            required>
+
+                    </div>
+
+
+                    <!-- CONTRASEÑA -->
+
+                    <div class="campo-usuario">
+
+                        <label for="nuevoPassword">
+                            <i class="bi bi-lock-fill"></i>
+                            Contraseña <span>*</span>
+                        </label>
+
+                        <div class="campo-password">
+
+                            <input
+                                type="password"
+                                id="nuevoPassword"
+                                name="password"
+                                placeholder="Mínimo 8 caracteres"
+                                minlength="8"
+                                required>
+
+                            <button
+                                type="button"
+                                id="mostrarPassword"
+                                aria-label="Mostrar contraseña">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DECORACIÓN -->
+
+                <div class="decoracion-modal">
+
+                    <span></span>
+                    <i class="bi bi-sombrero"></i>
+                    <span></span>
+
+                </div>
+
+
+                <!-- BOTONES -->
+
+                <div class="modal-usuario-acciones">
+
+                    <button
+                        type="button"
+                        class="btn-cancelar-modal"
+                        id="cancelarModalUsuario">
+
+                        <i class="bi bi-x-lg"></i>
+                        Cancelar
+
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="btn-guardar-modal">
+
+                        <i class="bi bi-floppy-fill"></i>
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/usuarios.js') }}"></script>
+
+
+<!-- =====================================
+     MODAL EDITAR USUARIO
+===================================== -->
+
+<div class="modal-usuario-overlay" id="modalEditarUsuario">
+
+    <div class="modal-usuario">
+
+        <div class="modal-usuario-header">
+
+            <h2>
+                <i class="bi bi-person-gear"></i>
+                Editar Usuario
+            </h2>
+
+            <button
+                type="button"
+                class="cerrar-modal-usuario"
+                id="cerrarModalEditar">
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+
+        <form method="POST" 
+              id="formEditarUsuario"
+              data-url-base="{{ url_for('usuarios.editar_usuario', id_usuario=0) }}">
+
+            <div class="modal-usuario-contenido">
+
+                <p class="modal-descripcion">
+                    Modifica la información del usuario seleccionado.
+                </p>
+
+
+                <div class="formulario-usuario-grid">
+
+                    <!-- NOMBRE -->
+
+                    <div class="campo-usuario">
+
+                        <label for="editarNombre">
+                            <i class="bi bi-person-fill"></i>
+                            Nombre completo *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="editarNombre"
+                            name="nombre"
+                            maxlength="100"
+                            required>
+
+                    </div>
+
+
+                    <!-- ROL -->
+
+                    <div class="campo-usuario">
+
+                        <label for="editarRol">
+                            <i class="bi bi-people-fill"></i>
+                            Rol *
+                        </label>
+
+                        <select
+                            id="editarRol"
+                            name="id_rol"
+                            required>
+
+                            {% for rol in roles %}
+
+                                <option value="{{ rol.id_rol }}">
+                                    {{ rol.nombre }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CORREO -->
+
+                    <div class="campo-usuario">
+
+                        <label for="editarCorreo">
+                            <i class="bi bi-envelope"></i>
+                            Correo electrónico *
+                        </label>
+
+                        <input
+                            type="email"
+                            id="editarCorreo"
+                            name="correo"
+                            maxlength="120"
+                            required>
+
+                    </div>
+
+
+                    <!-- ESTADO -->
+
+                    <div class="campo-usuario">
+
+                        <label for="editarEstado">
+                            <i class="bi bi-power"></i>
+                            Estado *
+                        </label>
+
+                        <select
+                            id="editarEstado"
+                            name="estado"
+                            required>
+
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- USERNAME -->
+
+                    <div class="campo-usuario">
+
+                        <label for="editarUsername">
+                            <i class="bi bi-person-vcard-fill"></i>
+                            Nombre de usuario *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="editarUsername"
+                            name="username"
+                            maxlength="50"
+                            required>
+
+                    </div>
+
+
+                    <!-- CONTRASEÑA -->
+
+                    <div class="campo-usuario">
+
+                        <label for="editarPassword">
+                            <i class="bi bi-lock-fill"></i>
+                            Nueva contraseña
+                        </label>
+
+                        <div class="campo-password">
+
+                            <input
+                                type="password"
+                                id="editarPassword"
+                                name="password"
+                                placeholder="Dejar vacío para conservarla"
+                                minlength="8">
+
+                            <button
+                                type="button"
+                                id="mostrarPasswordEditar"
+                                aria-label="Mostrar contraseña">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="decoracion-modal">
+
+
+                </div>
+
+
+                <div class="modal-usuario-acciones">
+
+                    <button
+                        type="button"
+                        class="btn-cancelar-modal"
+                        id="cancelarModalEditar">
+
+                        <i class="bi bi-x-lg"></i>
+                        Cancelar
+
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="btn-guardar-modal">
+
+                        <i class="bi bi-floppy-fill"></i>
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     MODAL CONFIRMAR DESACTIVACIÓN
+===================================== -->
+
+<div class="modal-usuario-overlay" id="modalEliminarUsuario">
+
+    <div class="modal-usuario modal-confirmacion">
+
+        <!-- ENCABEZADO -->
+
+        <div class="modal-usuario-header">
+
+            <h2>
+                <i class="bi bi-person-x-fill"></i>
+                Desactivar usuario
+            </h2>
+
+            <button
+                type="button"
+                class="cerrar-modal-usuario"
+                id="cerrarModalEliminar"
+                aria-label="Cerrar">
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- CONTENIDO -->
+
+        <div class="modal-confirmacion-contenido">
+
+            <div class="icono-advertencia">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+
+            <h3>¿Estás segura?</h3>
+
+            <p>
+                ¿Deseas desactivar al usuario
+                <strong id="nombreUsuarioEliminar"></strong>?
+            </p>
+
+            <p class="texto-aclaracion">
+                Ya no podrá iniciar sesión en el sistema,
+                pero sus ventas y demás registros históricos
+                se conservarán.
+            </p>
+
+        </div>
+
+
+        <!-- BOTONES -->
+
+        <div class="modal-usuario-acciones">
+
+            <button
+                type="button"
+                class="btn-cancelar-modal"
+                id="cancelarModalEliminar">
+
+                <i class="bi bi-x-lg"></i>
+                Cancelar
+
+            </button>
+
+
+            <button
+                type="button"
+                class="btn-confirmar-eliminar"
+                id="confirmarEliminar">
+
+                <i class="bi bi-trash-fill"></i>
+                Desactivar usuario
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

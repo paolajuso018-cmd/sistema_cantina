@@ -1,0 +1,658 @@
+/* ==========================================
+   1. CONFIGURACIÓN GENERAL
+========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Georgia, serif;
+    color: #241D1A;
+    background: #241D1A;
+}
+
+
+/* ==========================================
+   2. FONDO PRINCIPAL
+========================================== */
+
+.pagina-reservaciones {
+    min-height: 100vh;
+    padding: 25px 4% 45px;
+
+    background:
+        linear-gradient(#241D1A55, #241D1A55),
+        url("../img/fondo_reservas.png");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+/* ==========================================
+   3. ENCABEZADO
+========================================== */
+
+.encabezado-reservaciones {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 300px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.volver {
+    color: #F2EBDD;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.volver:hover {
+    color: #D7A64B;
+}
+
+
+/* ==========================================
+   4. PANEL PRINCIPAL
+========================================== */
+
+.contenido-reservaciones {
+    width: 100%;
+    max-width: 1500px;
+    margin: auto;
+
+    padding: 30px;
+
+    background: #F2EBDD;
+
+    border: 3px solid #B58A4A;
+    border-radius: 20px;
+
+    box-shadow: 0 10px 35px #0007;
+}
+
+
+/* ==========================================
+   5. TÍTULO
+========================================== */
+
+.titulo-reservacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+
+    color: #762F2C;
+}
+
+.titulo-reservacion h1 {
+    font-size: clamp(30px, 3.5vw, 46px);
+    text-align: center;
+}
+
+.titulo-reservacion span {
+    color: #B58A4A;
+    font-size: 30px;
+}
+
+.subtitulo {
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.6;
+
+    margin: 12px 0 28px;
+}
+
+
+/* ==========================================
+   6. DISTRIBUCIÓN PRINCIPAL
+========================================== */
+
+.reservacion-contenido {
+    display: grid;
+    grid-template-columns: 0.85fr 1.3fr;
+    gap: 25px;
+    align-items: stretch;
+}
+
+
+/* ==========================================
+   7. FORMULARIO
+========================================== */
+
+.formulario-reserva,
+.plano-reserva {
+    min-width: 0;
+    padding: 22px;
+
+    border: 1px solid #B58A4A;
+    border-radius: 14px;
+
+    background: #F8EBD6;
+}
+
+.formulario-reserva h2,
+.plano-reserva h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 45px;
+    padding: 8px;
+
+    margin-bottom: 20px;
+
+    background: #762F2C;
+    color: white;
+
+    border-radius: 30px;
+
+    font-size: 21px;
+}
+
+.formulario-reserva form {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.formulario-reserva label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #241D1A;
+}
+
+.formulario-reserva input,
+.formulario-reserva select,
+.formulario-reserva textarea {
+    width: 100%;
+    min-width: 0;
+
+    min-height: 42px;
+    padding: 10px 12px;
+
+    background: #FFF9EF;
+    color: #241D1A;
+
+    border: 1px solid #C7B99F;
+    border-radius: 8px;
+
+    font-family: Georgia, serif;
+    font-size: 14px;
+    outline: none;
+}
+
+.formulario-reserva input:focus,
+.formulario-reserva select:focus,
+.formulario-reserva textarea:focus {
+    border-color: #B58A4A;
+    box-shadow: 0 0 0 2px #B58A4A30;
+}
+
+.formulario-reserva textarea {
+    min-height: 85px;
+    resize: vertical;
+}
+
+.campos-dobles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.campos-dobles > div {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+
+/* ==========================================
+   8. PLANO DEL ESTABLECIMIENTO
+========================================== */
+
+.plano-contenedor {
+    width: 100%;
+    padding: 8px;
+
+    background: #D8C6A5;
+    border: 2px solid #B58A4A;
+    border-radius: 10px;
+}
+
+.plano-mapa {
+    position: relative;
+    width: 100%;
+
+    overflow: hidden;
+    border-radius: 7px;
+
+    line-height: 0;
+}
+
+.imagen-plano {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+
+/* ==========================================
+   9. MESAS SELECCIONABLES
+========================================== */
+
+.zona-mesa {
+    position: absolute;
+
+    transform: translate(-50%, -50%);
+
+    background: transparent;
+    border: 3px solid transparent;
+    border-radius: 50%;
+
+    cursor: pointer;
+    z-index: 2;
+
+    transition: 0.2s;
+}
+
+.zona-mesa:hover {
+    background: #65A34B40;
+    border-color: #65A34B;
+}
+
+
+/* MESA 1: REDONDA, 2 PERSONAS */
+
+.zona-mesa[data-mesa="M1"] {
+    left: 39.5%;
+    top: 38.5%;
+    width: 15%;
+    height: 21%;
+}
+
+
+/* MESA 2: CUADRADA, 4 PERSONAS */
+
+.zona-mesa[data-mesa="M2"] {
+    left: 67.5%;
+    top: 38%;
+    width: 17%;
+    height: 22%;
+    border-radius: 15%;
+}
+
+
+/* MESA 3: RECTANGULAR, 6 PERSONAS */
+
+.zona-mesa[data-mesa="M3"] {
+    left: 33%;
+    top: 63%;
+    width: 24%;
+    height: 25%;
+    border-radius: 15%;
+}
+
+
+/* MESA 4: REDONDA, 8 PERSONAS */
+
+.zona-mesa[data-mesa="M4"] {
+    left: 64.5%;
+    top: 63.5%;
+    width: 24%;
+    height: 27%;
+}
+
+
+/* MESA SELECCIONADA */
+
+.zona-mesa.seleccionada {
+    background: #D7A32D55;
+    border: 4px solid #D7A32D;
+
+    box-shadow: 0 0 15px #D7A32D;
+}
+
+
+/* ==========================================
+   10. LEYENDA
+========================================== */
+
+.leyenda-mesas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 20px;
+    margin-top: 17px;
+
+    font-size: 13px;
+}
+
+.leyenda-mesas span {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.leyenda-mesas i {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+}
+
+.disponible {
+    background: #65A34B;
+}
+
+.seleccionada {
+    background: #D7A32D;
+}
+
+.ocupada {
+    background: #A33A36;
+}
+
+.mesa-elegida {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 15px;
+}
+
+.mesa-elegida strong {
+    color: #762F2C;
+}
+
+
+/* ==========================================
+   11. BOTONES
+========================================== */
+
+.acciones-reserva {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.boton-cancelar,
+.boton-confirmar {
+    min-width: 220px;
+    min-height: 48px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 12px 25px;
+
+    border-radius: 30px;
+
+    font-family: Georgia, serif;
+    font-weight: bold;
+    font-size: 16px;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.boton-cancelar {
+    color: #762F2C;
+    background: transparent;
+    border: 2px solid #762F2C;
+}
+
+.boton-confirmar {
+    color: white;
+    background: linear-gradient(135deg, #762F2C, #9C202B);
+    border: 2px solid #762F2C;
+    box-shadow: 0 4px 0 #4D1919;
+}
+
+.boton-cancelar:hover,
+.boton-confirmar:hover {
+    transform: translateY(-3px);
+}
+
+
+/* ==========================================
+   12. TABLET
+========================================== */
+
+@media (max-width: 1000px) {
+
+    .contenido-reservaciones {
+        padding: 22px;
+    }
+
+    .reservacion-contenido {
+        grid-template-columns: 1fr 1.2fr;
+        gap: 15px;
+    }
+
+    .formulario-reserva,
+    .plano-reserva {
+        padding: 15px;
+    }
+
+    .campos-dobles {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* ==========================================
+   13. CELULAR
+========================================== */
+
+@media (max-width: 700px) {
+
+    .pagina-reservaciones {
+        padding: 12px;
+    }
+
+    .encabezado-reservaciones {
+        margin-bottom: 15px;
+    }
+
+    .logo img {
+        width: 130px;
+        height: 60px;
+    }
+
+    .volver {
+        font-size: 13px;
+    }
+
+    .contenido-reservaciones {
+        padding: 15px;
+    }
+
+    .titulo-reservacion {
+        gap: 8px;
+    }
+
+    .titulo-reservacion h1 {
+        font-size: 29px;
+    }
+
+    .titulo-reservacion span {
+        font-size: 20px;
+    }
+
+    .subtitulo {
+        font-size: 13px;
+    }
+
+    .reservacion-contenido {
+        grid-template-columns: 1fr;
+    }
+
+    .campos-dobles {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .zona-mesa {
+        border-width: 2px;
+    }
+
+    .zona-mesa.seleccionada {
+        border-width: 3px;
+    }
+
+    .leyenda-mesas {
+        gap: 10px;
+        font-size: 11px;
+    }
+
+    .acciones-reserva {
+        flex-direction: column;
+    }
+
+    .boton-cancelar,
+    .boton-confirmar {
+        width: 100%;
+    }
+
+}
+
+
+/* ==========================================
+   14. CELULARES PEQUEÑOS
+========================================== */
+
+@media (max-width: 380px) {
+
+    .campos-dobles {
+        grid-template-columns: 1fr;
+    }
+
+    .formulario-reserva,
+    .plano-reserva {
+        padding: 12px;
+    }
+
+}
+/* =====================================
+   NOTIFICACIÓN EMERGENTE
+===================================== */
+
+.notificacion {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-width: 280px;
+    max-width: 380px;
+
+    padding: 15px 18px;
+
+    background: #F2EBDD;
+    color: #241D1A;
+
+    border-left: 5px solid #B58A4A;
+    border-radius: 9px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.22);
+
+    font-size: 14px;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(30px);
+
+    transition: all 0.35s ease;
+}
+
+.notificacion.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.notificacion.success {
+    border-left-color: #3B8055;
+}
+
+.notificacion.error {
+    border-left-color: #A83C35;
+}
+
+#iconoNotificacion {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+#textoNotificacion {
+    flex: 1;
+    line-height: 1.4;
+}
+
+#cerrarNotificacion {
+    border: none;
+    background: transparent;
+    color: #777873;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .notificacion {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+        min-width: auto;
+        max-width: none;
+    }
+}
+/* =====================================
+   MESAS OCUPADAS
+===================================== */
+
+.zona-mesa.ocupada {
+    background: rgba(181, 47, 50, 0.48) !important;
+    border: 3px solid #B52F32 !important;
+    border-radius: 12px;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+    pointer-events: none;
+    box-shadow: 0 0 12px rgba(181, 47, 50, 0.65);
+}
+
+/* Mesa seleccionada */
+
+.zona-mesa.seleccionada {
+    background: rgba(215, 163, 41, 0.40);
+    border: 3px solid #D7A329;
+    box-shadow: 0 0 12px rgba(215, 163, 41, 0.65);
+}
+
+/* Mesa disponible */
+
+.zona-mesa:not(.ocupada):not(.seleccionada) {
+    cursor: pointer;
+}
