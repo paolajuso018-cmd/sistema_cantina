@@ -77,7 +77,11 @@
                         activo
                     {% elif elemento.nombre == 'Recetas' and request.endpoint == 'recetas.gestionar_recetas' %}
                         activo
-                    {% endif %}">
+                    {% elif elemento.nombre == 'Reservaciones' and request.endpoint == 'administrativo.reservaciones_administrador' %}
+                        activo
+                    {% endif %}"
+                    
+                    >
 
                         <span class="menu-icono">
                             <i class="bi {{ elemento.icono }}"></i>

@@ -6,7 +6,8 @@ from flask import (
     url_for,
     flash,
     send_file,
-    jsonify
+    jsonify,
+    session
 )
 
 from models.conexion import obtener_conexion
@@ -309,7 +310,7 @@ def index():
             FROM reservaciones
             WHERE id_mesa = %s
               AND fecha = %s
-              AND estado = 'Reservada'
+              AND estado IN ('Reservada', 'Confirmada', 'En curso')
             LIMIT 1
         """, (mesa_id, fecha_reserva))
 
@@ -573,7 +574,7 @@ def mesas_ocupadas():
             SELECT DISTINCT id_mesa
             FROM reservaciones
             WHERE fecha = %s
-              AND estado = 'Reservada'
+              AND estado IN  ('Reservada', 'Confirmada', 'En curso')
         """, (fecha_consulta,))
 
         resultados = cursor.fetchall()
@@ -668,3 +669,115 @@ def vista_previa():
             "No se pudo generar el comprobante. Revisa la terminal.",
             500
         )
+
+    # ==========================================
+# ACTUALIZAR ESTADO DE UNA RESERVACIÓN
+# ==========================================
+
+@reservaciones_bp.route(
+    "/admin/api/<int:id_reservacion>/estado",
+    methods=["POST"]
+)
+def actualizar_estado_reservacion(id_reservacion):
+
+    if "id_usuario" not in session:
+        return jsonify({
+            "ok": False,
+            "mensaje": "Debes iniciar sesión."
+        }), 401
+
+    rol = str(session.get("rol", "")).strip().lower()
+
+    if rol not in ["administrador", "gerente"]:
+        return jsonify({
+            "ok": False,
+            "mensaje": "No tienes autorización."
+        }), 403
+
+    datos = request.get_json(silent=True) or {}
+    nuevo_estado = datos.get("estado", "").strip()
+
+    estados_permitidos = [
+        "Confirmada",
+        "En curso",
+        "Finalizada",
+        "Cancelada"
+    ]
+
+    if nuevo_estado not in estados_permitidos:
+        return jsonify({
+            "ok": False,
+            "mensaje": "Estado no válido."
+        }), 400
+
+    conexion = None
+    cursor = None
+
+    try:
+
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+
+        cursor.execute("""
+            SELECT estado
+            FROM reservaciones
+            WHERE id_reservacion = %s
+        """, (id_reservacion,))
+
+        reservacion = cursor.fetchone()
+
+        if not reservacion:
+            return jsonify({
+                "ok": False,
+                "mensaje": "La reservación no existe."
+            }), 404
+
+        estado_actual = reservacion[0]
+
+        if estado_actual not in [
+            "Reservada",
+            "Confirmada",
+            "En curso"
+        ]:
+            return jsonify({
+                "ok": False,
+                "mensaje": "Esta reservación ya no está activa."
+            }), 400
+
+        cursor.execute("""
+            UPDATE reservaciones
+            SET estado = %s
+            WHERE id_reservacion = %s
+        """, (nuevo_estado, id_reservacion))
+
+        conexion.commit()
+
+        return jsonify({
+            "ok": True,
+            "mensaje": (
+                "Mesa liberada correctamente."
+                if nuevo_estado == "Finalizada"
+                else "Estado actualizado correctamente."
+            ),
+            "estado": nuevo_estado
+        })
+
+    except Exception as error:
+
+        if conexion:
+            conexion.rollback()
+
+        print("ERROR AL ACTUALIZAR RESERVACIÓN:", repr(error))
+
+        return jsonify({
+            "ok": False,
+            "mensaje": "No fue posible actualizar la reservación."
+        }), 500
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if conexion:
+            conexion.close()

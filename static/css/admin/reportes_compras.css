@@ -1,0 +1,539 @@
+
+/* ==========================================
+   REPORTES DE COMPRAS - LA CANTINA
+========================================== */
+
+.reporte-compras {
+    width: 100%;
+    padding: 8px 2px 30px;
+    color: #650d17;
+    box-sizing: border-box;
+}
+
+.reporte-compras * {
+    box-sizing: border-box;
+}
+
+/* ENCABEZADO */
+
+.rc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.rc-titulo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.rc-titulo > i {
+    font-size: 47px;
+    color: #790c1a;
+}
+
+.rc-titulo h1 {
+    font-family: Georgia, serif;
+    font-size: 32px;
+    color: #790c1a;
+    margin: 0;
+}
+
+.rc-titulo p {
+    margin: 4px 0 0;
+    color: #80615a;
+    font-size: 14px;
+}
+
+.rc-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.rc-acciones button {
+    border: 1px solid #790c1a;
+    background: #790c1a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.rc-acciones button:hover {
+    background: #9a1728;
+}
+
+/* PANELES */
+
+.rc-panel {
+    background: rgba(255, 250, 241, .82);
+    border: 1px solid #ead2c3;
+    border-radius: 14px;
+    padding: 17px;
+    min-width: 0;
+    box-shadow: 0 3px 10px rgba(91, 25, 20, .035);
+}
+
+.rc-panel-titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.rc-panel-titulo h2,
+.rc-filtros-titulo h2 {
+    margin: 0;
+    color: #790c1a;
+    font-family: Georgia, serif;
+    font-size: 20px;
+}
+
+.rc-panel-titulo h2 i,
+.rc-filtros-titulo h2 i {
+    margin-right: 7px;
+}
+
+.rc-panel-titulo p {
+    margin: 4px 0 0;
+    color: #92736a;
+    font-size: 12px;
+}
+
+/* FILTROS */
+
+.rc-filtros {
+    margin-bottom: 16px;
+}
+
+.rc-filtros-titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.rc-filtros-titulo button {
+    background: transparent;
+    color: #790c1a;
+    border: 0;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.rc-filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.rc-filtros-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #6b2024;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.rc-filtros-grid input,
+.rc-filtros-grid select {
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #e3cabe;
+    border-radius: 8px;
+    background: #fffdfa;
+    color: #382722;
+    font: inherit;
+}
+
+#btnAplicarFiltros {
+    background: #790c1a;
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 17px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#btnAplicarFiltros:hover {
+    background: #991729;
+}
+
+/* INDICADORES */
+
+.rc-indicadores {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 13px;
+    margin-bottom: 16px;
+}
+
+.rc-indicador {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 105px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(100, 20, 20, .08);
+}
+
+.rc-indicador .rc-icono {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .55);
+    font-size: 27px;
+}
+
+.rc-indicador span {
+    display: block;
+    color: #642026;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.rc-indicador strong {
+    display: block;
+    margin-top: 4px;
+    color: #710d19;
+    font-family: Georgia, serif;
+    font-size: 25px;
+    overflow-wrap: anywhere;
+}
+
+.rc-indicador small {
+    display: block;
+    margin-top: 4px;
+    color: #886b62;
+    font-size: 10px;
+}
+
+.indicador-rosa {
+    background: #fbe3df;
+}
+
+.indicador-dorado {
+    background: #fff0d3;
+}
+
+.indicador-verde {
+    background: #e7f2dd;
+}
+
+.indicador-lila {
+    background: #f2e5f3;
+}
+
+/* GRÁFICAS */
+
+.rc-graficas {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.rc-chart-contenedor {
+    width: 100%;
+    height: 285px;
+    position: relative;
+}
+
+.rc-grafica-grande .rc-chart-contenedor {
+    height: 300px;
+}
+
+/* TABLAS */
+
+.rc-insumos,
+.rc-historial {
+    margin-bottom: 16px;
+}
+
+.rc-tabla-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.rc-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+    font-size: 13px;
+}
+
+.rc-tabla thead {
+    background: #790c1a;
+    color: white;
+}
+
+.rc-tabla th {
+    padding: 12px 10px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.rc-tabla th:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.rc-tabla th:last-child {
+    border-radius: 0 8px 8px 0;
+}
+
+.rc-tabla td {
+    padding: 12px 10px;
+    text-align: center;
+    color: #392823;
+    border-bottom: 1px solid #eaded5;
+}
+
+.rc-tabla tbody tr:hover {
+    background: #fbede6;
+}
+
+.rc-tabla td:nth-child(2) {
+    font-weight: 700;
+}
+
+.rc-posicion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #f6e1c8;
+    color: #790c1a;
+    font-weight: 800;
+}
+
+.rc-estado {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.rc-estado.registrada {
+    background: #d9f0c8;
+    color: #316323;
+}
+
+.rc-estado.pendiente {
+    background: #ffe7b1;
+    color: #805600;
+}
+
+.rc-estado.cancelada {
+    background: #f6d5d5;
+    color: #8c2525;
+}
+
+.rc-pie-tabla {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 13px;
+    color: #876c64;
+    font-size: 12px;
+}
+
+/* RESUMEN */
+
+.rc-resumen {
+    margin-bottom: 20px;
+}
+
+.rc-resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.rc-resumen-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 13px;
+    border-radius: 9px;
+    background: #f9eee5;
+}
+
+.rc-resumen-grid span {
+    color: #8b6c62;
+    font-size: 12px;
+}
+
+.rc-resumen-grid strong {
+    color: #790c1a;
+    font-size: 14px;
+}
+
+/* CARGA */
+
+.rc-cargando {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(255, 248, 240, .75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: #790c1a;
+    font-weight: 700;
+}
+
+.rc-cargando.visible {
+    display: flex;
+}
+
+.rc-spinner {
+    width: 42px;
+    height: 42px;
+    border: 4px solid #ead3c6;
+    border-top-color: #790c1a;
+    border-radius: 50%;
+    animation: rcGirar .8s linear infinite;
+}
+
+@keyframes rcGirar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* TOAST */
+
+.rc-toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 10001;
+    max-width: 90%;
+    padding: 13px 19px;
+    border-radius: 10px;
+    background: #790c1a;
+    color: white;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: .25s;
+}
+
+.rc-toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* IMPRESIÓN */
+
+@media print {
+    body {
+        background: white !important;
+    }
+
+    .rc-header .rc-acciones,
+    .rc-filtros,
+    .rc-cargando,
+    .rc-toast {
+        display: none !important;
+    }
+
+    .reporte-compras {
+        padding: 0;
+    }
+
+    .rc-panel {
+        box-shadow: none;
+        break-inside: avoid;
+    }
+
+    .rc-graficas {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .rc-tabla {
+        min-width: 0;
+    }
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+    .rc-filtros-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .rc-indicadores {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .rc-graficas {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .rc-header {
+        align-items: flex-start;
+    }
+
+    .rc-titulo h1 {
+        font-size: 25px;
+    }
+
+    .rc-indicadores {
+        grid-template-columns: 1fr;
+    }
+
+    .rc-filtros-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rc-filtros-titulo {
+        align-items: flex-start;
+        gap: 10px;
+        flex-direction: column;
+    }
+
+    .rc-resumen-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rc-panel {
+        padding: 12px;
+    }
+
+    .rc-chart-contenedor,
+    .rc-grafica-grande .rc-chart-contenedor {
+        height: 250px;
+    }
+
+    .rc-acciones {
+        width: 100%;
+    }
+
+    .rc-acciones button {
+        flex: 1;
+    }
+}

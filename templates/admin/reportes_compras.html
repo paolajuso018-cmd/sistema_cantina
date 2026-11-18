@@ -1,0 +1,283 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}Reportes de Compras | La Cantina{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin/reportes_compras.css') }}">
+{% endblock %}
+
+{% block contenido %}
+
+<div class="reporte-compras">
+
+    <header class="rc-header">
+        <div class="rc-titulo">
+            <i class="bi bi-bar-chart-line"></i>
+            <div>
+                <h1>Reportes de Compras</h1>
+                <p>Análisis de gastos, proveedores e insumos adquiridos.</p>
+            </div>
+        </div>
+
+        <div class="rc-acciones">
+            <button type="button" id="btnExportarCSV">
+                <i class="bi bi-file-earmark-excel"></i>
+                Exportar Excel (CSV)
+            </button>
+            <button type="button" id="btnImprimir">
+                <i class="bi bi-printer"></i>
+                Imprimir
+            </button>
+        </div>
+    </header>
+
+    <!-- FILTROS -->
+    <section class="rc-panel rc-filtros">
+
+        <div class="rc-filtros-titulo">
+            <h2><i class="bi bi-funnel"></i> Filtrar reportes</h2>
+            <button type="button" id="btnLimpiarFiltros">
+                Limpiar filtros
+            </button>
+        </div>
+
+        <div class="rc-filtros-grid">
+
+            <label>
+                Fecha inicial
+                <input type="date" id="filtroDesde">
+            </label>
+
+            <label>
+                Fecha final
+                <input type="date" id="filtroHasta">
+            </label>
+
+            <label>
+                Proveedor
+                <select id="filtroProveedor">
+                    <option value="">Todos los proveedores</option>
+                </select>
+            </label>
+
+            <label>
+                Estado
+                <select id="filtroEstado">
+                    <option value="">Todos los estados</option>
+                    <option value="Registrada">Registrada</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </label>
+
+            <button type="button" id="btnAplicarFiltros">
+                <i class="bi bi-search"></i>
+                Consultar
+            </button>
+
+        </div>
+    </section>
+
+    <!-- INDICADORES -->
+    <section class="rc-indicadores">
+
+        <article class="rc-indicador indicador-rosa">
+            <div class="rc-icono">
+                <i class="bi bi-cart-check"></i>
+            </div>
+            <div>
+                <span>Compras realizadas</span>
+                <strong id="totalCompras">0</strong>
+                <small>En el periodo seleccionado</small>
+            </div>
+        </article>
+
+        <article class="rc-indicador indicador-dorado">
+            <div class="rc-icono">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div>
+                <span>Gasto total</span>
+                <strong id="gastoTotal">$0.00</strong>
+                <small>Compras registradas</small>
+            </div>
+        </article>
+
+        <article class="rc-indicador indicador-verde">
+            <div class="rc-icono">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div>
+                <span>Insumos comprados</span>
+                <strong id="insumosComprados">0</strong>
+                <small>Unidades adquiridas</small>
+            </div>
+        </article>
+
+        <article class="rc-indicador indicador-lila">
+            <div class="rc-icono">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div>
+                <span>Compras pendientes</span>
+                <strong id="comprasPendientes">0</strong>
+                <small>Por completar</small>
+            </div>
+        </article>
+
+    </section>
+
+    <!-- GRÁFICAS -->
+    <section class="rc-graficas">
+
+        <article class="rc-panel rc-grafica-grande">
+            <div class="rc-panel-titulo">
+                <div>
+                    <h2><i class="bi bi-graph-up"></i> Gastos por mes</h2>
+                    <p>Comportamiento de las compras registradas.</p>
+                </div>
+            </div>
+
+            <div class="rc-chart-contenedor">
+                <canvas id="graficaComprasMes"></canvas>
+            </div>
+        </article>
+
+        <article class="rc-panel">
+            <div class="rc-panel-titulo">
+                <div>
+                    <h2><i class="bi bi-building"></i> Gasto por proveedor</h2>
+                    <p>Proveedores con mayor importe de compras.</p>
+                </div>
+            </div>
+
+            <div class="rc-chart-contenedor">
+                <canvas id="graficaProveedores"></canvas>
+            </div>
+        </article>
+
+    </section>
+
+    <!-- INSUMOS MÁS COMPRADOS -->
+    <section class="rc-panel rc-insumos">
+
+        <div class="rc-panel-titulo">
+            <div>
+                <h2><i class="bi bi-boxes"></i> Insumos más comprados</h2>
+                <p>Productos con mayor volumen de adquisición.</p>
+            </div>
+        </div>
+
+        <div class="rc-tabla-scroll">
+            <table class="rc-tabla">
+                <thead>
+                    <tr>
+                        <th>Posición</th>
+                        <th>Insumo</th>
+                        <th>Cantidad comprada</th>
+                        <th>Importe acumulado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaInsumos">
+                    <tr>
+                        <td colspan="4">Cargando información...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="rc-panel rc-historial">
+
+        <div class="rc-panel-titulo">
+            <div>
+                <h2><i class="bi bi-journal-text"></i> Historial de compras</h2>
+                <p>Registro de compras realizadas a proveedores.</p>
+            </div>
+
+            <span id="totalRegistros">0 registros</span>
+        </div>
+
+        <div class="rc-tabla-scroll">
+            <table class="rc-tabla">
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Proveedor</th>
+                        <th>Fecha</th>
+                        <th>Productos</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tablaHistorial">
+                    <tr>
+                        <td colspan="7">Cargando compras...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="rc-pie-tabla">
+            <span id="textoResultados">Mostrando compras del periodo seleccionado</span>
+        </div>
+
+    </section>
+
+    <!-- DETALLE -->
+    <section class="rc-panel rc-resumen">
+
+        <div class="rc-panel-titulo">
+            <div>
+                <h2><i class="bi bi-info-circle"></i> Resumen del reporte</h2>
+                <p>Información correspondiente a los filtros aplicados.</p>
+            </div>
+        </div>
+
+        <div class="rc-resumen-grid">
+            <div>
+                <span>Periodo consultado</span>
+                <strong id="resumenPeriodo">--</strong>
+            </div>
+            <div>
+                <span>Proveedor seleccionado</span>
+                <strong id="resumenProveedor">Todos</strong>
+            </div>
+            <div>
+                <span>Estado seleccionado</span>
+                <strong id="resumenEstado">Todos</strong>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- CARGA Y NOTIFICACIONES -->
+    <div class="rc-cargando" id="rcCargando">
+        <div class="rc-spinner"></div>
+        <span>Consultando información...</span>
+    </div>
+
+    <div class="rc-toast" id="rcToast"></div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const API_REPORTES_COMPRAS =
+        "{{ url_for('compras.api_reportes_compras') }}";
+</script>
+
+<script src="{{ url_for('static', filename='js/admin/reportes_compras.js') }}"
+        defer></script>
+
+{% endblock %}

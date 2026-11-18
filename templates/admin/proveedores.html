@@ -1,0 +1,340 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}Proveedores | La Cantina{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/proveedores.css') }}">
+{% endblock %}
+
+{% block contenido %}
+
+<div class="proveedores-admin">
+
+    <header class="prov-header">
+        <div class="prov-titulo">
+            <i class="bi bi-people"></i>
+            <div>
+                <h1>Proveedores</h1>
+                <p>Gestión, registro y control de proveedores del establecimiento.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- INDICADORES -->
+    <section class="prov-indicadores">
+
+        <article class="prov-indicador rosa">
+            <i class="bi bi-people"></i>
+            <div>
+                <span>Total de proveedores</span>
+                <strong id="totalProveedores">0</strong>
+            </div>
+        </article>
+
+        <article class="prov-indicador amarillo">
+            <i class="bi bi-truck"></i>
+            <div>
+                <span>Compras realizadas</span>
+                <strong id="totalCompras">0</strong>
+            </div>
+        </article>
+
+        <article class="prov-indicador verde">
+            <i class="bi bi-cash-stack"></i>
+            <div>
+                <span>Gasto con proveedores</span>
+                <strong id="gastoProveedores">$0.00</strong>
+            </div>
+        </article>
+
+        <article class="prov-indicador lila">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div>
+                <span>Proveedores inactivos</span>
+                <strong id="proveedoresInactivos">0</strong>
+            </div>
+        </article>
+
+        <button type="button" class="btn-nuevo-proveedor" id="btnNuevoProveedor">
+            <i class="bi bi-plus-lg"></i> Nuevo Proveedor
+        </button>
+
+    </section>
+
+    <!-- PESTAÑAS -->
+    <nav class="prov-tabs">
+        <button type="button" class="prov-tab activo" data-tab="proveedores">
+            <i class="bi bi-people"></i> Proveedores
+        </button>
+
+        <button type="button" class="prov-tab" data-tab="historial">
+            <i class="bi bi-box-seam"></i> Historial de Compras por Proveedor
+        </button>
+
+        <button type="button" class="prov-tab" data-tab="desempeno">
+            <i class="bi bi-bar-chart-line"></i> Desempeño de Proveedores
+        </button>
+    </nav>
+
+    <!-- VISTA PRINCIPAL -->
+    <section class="prov-vista activa" id="vistaProveedores">
+
+        <div class="prov-layout">
+
+            <div class="prov-columna-principal">
+
+                <div class="prov-filtros">
+                    <label>
+                        <i class="bi bi-funnel"></i>
+                        Filtros:
+                        <select id="filtroEstado">
+                            <option value="">Todos los estados</option>
+                            <option value="Activo">Activos</option>
+                            <option value="Inactivo">Inactivos</option>
+                        </select>
+                    </label>
+
+                    <div class="prov-busqueda">
+                        <i class="bi bi-search"></i>
+                        <input type="search" id="buscarProveedor"
+                               placeholder="Buscar proveedor...">
+                    </div>
+                </div>
+
+                <article class="prov-panel">
+                    <div class="prov-tabla-scroll">
+                        <table class="prov-tabla">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Proveedor</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo</th>
+                                    <th>Estado</th>
+                                    <th>Insumos</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProveedores">
+                                <tr>
+                                    <td colspan="7">Cargando proveedores...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="prov-panel prov-productos">
+                    <h2><i class="bi bi-box-seam"></i> Insumos que suministra</h2>
+                    <p class="prov-nota">
+                        Insumos asociados al proveedor seleccionado.
+                    </p>
+
+                    <div class="prov-tabla-scroll">
+                        <table class="prov-tabla">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Insumo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProductos">
+                                <tr>
+                                    <td colspan="2">Selecciona un proveedor.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+            </div>
+
+            <aside class="prov-columna-detalle">
+
+                <article class="prov-panel prov-detalle">
+                    <h2><i class="bi bi-info-circle"></i> Detalle del Proveedor</h2>
+                    <div id="detalleProveedor">
+                        <div class="prov-detalle-vacio">
+                            <i class="bi bi-person-lines-fill"></i>
+                            <p>Selecciona un proveedor para consultar sus datos.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="prov-panel">
+                    <h2><i class="bi bi-clipboard-check"></i> Resumen de compras</h2>
+                    <div id="resumenCompras">
+                        <p>Selecciona un proveedor para ver su resumen.</p>
+                    </div>
+                </article>
+
+            </aside>
+
+        </div>
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="prov-vista" id="vistaHistorial">
+        <article class="prov-panel">
+            <h2><i class="bi bi-clock-history"></i> Historial de Compras por Proveedor</h2>
+
+            <div class="prov-historial-filtro">
+                <label for="filtroHistorialProveedor">Proveedor</label>
+                <select id="filtroHistorialProveedor">
+                    <option value="">Selecciona un proveedor</option>
+                </select>
+            </div>
+
+            <div class="prov-tabla-scroll">
+                <table class="prov-tabla">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaHistorial">
+                        <tr><td colspan="4">Selecciona un proveedor.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+
+    <!-- DESEMPEÑO -->
+    <section class="prov-vista" id="vistaDesempeno">
+        <article class="prov-panel">
+            <h2><i class="bi bi-bar-chart-line"></i> Desempeño de Proveedores</h2>
+            <p class="prov-nota">Comparación del gasto acumulado por proveedor.</p>
+            <div class="prov-grafica-contenedor">
+                <canvas id="graficaDesempeno"></canvas>
+            </div>
+        </article>
+    </section>
+
+    <!-- MODAL NUEVO / EDITAR -->
+    <div class="prov-modal" id="modalProveedor">
+        <div class="prov-modal-contenido">
+
+            <header class="prov-modal-header">
+                <h2 id="tituloModalProveedor">
+                    <i class="bi bi-person-plus"></i> Nuevo proveedor
+                </h2>
+                <button type="button" id="cerrarModalProveedor" aria-label="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </header>
+
+            <form id="formProveedor">
+
+                <input type="hidden" id="idProveedor">
+
+                <div class="prov-form-grid">
+
+                    <label class="campo-completo">
+                        Nombre del proveedor *
+                        <input type="text" id="nombreProveedor" maxlength="120" required>
+                    </label>
+
+                    <label>
+                        Teléfono
+                        <input type="tel" id="telefonoProveedor" maxlength="20">
+                    </label>
+
+                    <label>
+                        Correo electrónico
+                        <input type="email" id="correoProveedor" maxlength="120">
+                    </label>
+
+                    <label class="campo-completo">
+                        Dirección
+                        <input type="text" id="direccionProveedor" maxlength="200">
+                    </label>
+
+                    <label class="campo-completo">
+                        Estado del proveedor *
+                        <select id="estadoProveedor" required>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                        </select>
+                    </label>
+
+                    <div class="campo-completo">
+                        <div class="prov-insumos-titulo">
+                            <strong>Insumos que suministra</strong>
+                            <span id="contadorInsumos">0 seleccionados</span>
+                        </div>
+
+                        <input type="search" id="buscarInsumo"
+                               class="prov-buscar-insumo"
+                               placeholder="Buscar insumo...">
+
+                        <div id="listaInsumosProveedor" class="lista-insumos-proveedor">
+                            <p>Cargando insumos...</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="prov-modal-acciones">
+                    <button type="button" class="btn-prov-secundario"
+                            id="cancelarModalProveedor">Cancelar</button>
+
+                    <button type="submit" class="btn-prov-guardar">
+                        <i class="bi bi-check-lg"></i> Guardar proveedor
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CAMBIAR ESTADO -->
+    <div class="prov-modal" id="modalEstadoProveedor">
+        <div class="prov-modal-contenido prov-confirmacion">
+            <div class="prov-confirmacion-icono">
+                <i class="bi bi-question-circle"></i>
+            </div>
+            <h2 id="tituloConfirmacion">Cambiar estado</h2>
+            <p id="mensajeConfirmacion"></p>
+
+            <div class="prov-modal-acciones">
+                <button type="button" class="btn-prov-secundario"
+                        id="cancelarCambioEstado">Cancelar</button>
+                <button type="button" class="btn-prov-guardar"
+                        id="confirmarCambioEstado">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="prov-cargando" id="provCargando">
+        <div class="prov-spinner"></div>
+        <span>Procesando información...</span>
+    </div>
+
+    <div class="prov-toast" id="provToast"></div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const API_PROVEEDORES =
+        "{{ url_for('proveedores.listar_proveedores') }}";
+
+    const API_INSUMOS_PROVEEDORES =
+        "{{ url_for('proveedores.listar_insumos_proveedores') }}";
+
+    const API_DETALLE_PROVEEDOR =
+        "{{ url_for('proveedores.detalle_proveedor', id_proveedor=0) }}";
+
+    const API_ESTADO_PROVEEDOR =
+        "{{ url_for('proveedores.cambiar_estado_proveedor', id_proveedor=0) }}";
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/admin/proveedores.js') }}" defer></script>
+{% endblock %}

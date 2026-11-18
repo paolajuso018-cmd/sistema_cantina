@@ -1,0 +1,429 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}Reservaciones | La Cantina{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin/reservaciones.css') }}">
+{% endblock %}
+
+{% block contenido %}
+
+<div class="admin-reservaciones">
+
+    <header class="res-header">
+        <div class="res-titulo">
+            <i class="bi bi-calendar2-check"></i>
+            <div>
+                <h1>Reservaciones</h1>
+                <p>Gestión y control de reservaciones del establecimiento.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- INDICADORES -->
+    <section class="res-indicadores">
+
+        <article class="res-indicador rosa">
+            <i class="bi bi-calendar-check"></i>
+            <div>
+                <span>Reservaciones de hoy</span>
+                <strong id="totalReservaciones">0</strong>
+            </div>
+        </article>
+
+        <article class="res-indicador amarillo">
+            <i class="bi bi-people"></i>
+            <div>
+                <span>Personas reservadas</span>
+                <strong id="totalPersonas">0</strong>
+            </div>
+        </article>
+
+        <article class="res-indicador verde">
+            <i class="bi bi-table"></i>
+            <div>
+                <span>Mesas reservadas</span>
+                <strong id="totalMesas">0</strong>
+            </div>
+        </article>
+
+        <article class="res-indicador lila">
+            <i class="bi bi-calendar2-minus"></i>
+            <div>
+                <span>Reservaciones pendientes</span>
+                <strong id="totalPendientes">0</strong>
+            </div>
+        </article>
+
+        <button class="btn-nueva-reserva" id="btnNuevaReserva" type="button">
+            <i class="bi bi-plus-lg"></i>
+            Nueva Reservación
+        </button>
+
+    </section>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <section class="res-layout">
+
+        <!-- COLUMNA IZQUIERDA -->
+        <aside class="res-columna-izquierda">
+
+            <article class="res-panel calendario-panel">
+
+                <div class="calendario-cabecera">
+                    <button id="mesAnterior" type="button"
+                            aria-label="Mes anterior">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+
+                    <h2 id="nombreMes">Noviembre 2026</h2>
+
+                    <button id="mesSiguiente" type="button"
+                            aria-label="Mes siguiente">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="calendario-dias">
+                    <span>Dom</span>
+                    <span>Lun</span>
+                    <span>Mar</span>
+                    <span>Mié</span>
+                    <span>Jue</span>
+                    <span>Vie</span>
+                    <span>Sáb</span>
+                </div>
+
+                <div class="calendario-grid" id="calendarioGrid"></div>
+
+            </article>
+
+            <!-- FILTROS -->
+            <article class="res-panel filtros-panel">
+
+                <h2>
+                    <i class="bi bi-funnel"></i>
+                    Filtros
+                </h2>
+
+                <label>
+                    <i class="bi bi-calendar3"></i>
+                    <select id="filtroFecha">
+                        <option value="seleccionada">Fecha seleccionada</option>
+                        <option value="hoy">Hoy</option>
+                    </select>
+                </label>
+
+                <label>
+                    <i class="bi bi-table"></i>
+                    <select id="filtroMesa">
+                        <option value="">Todas las mesas</option>
+                    </select>
+                </label>
+
+                <label>
+                    <i class="bi bi-tag"></i>
+                    <select id="filtroEstado">
+                        <option value="todas">Todos los estados</option>
+                        <option value="activas">Activas</option>
+                        <option value="historial">Finalizadas</option>
+                        <option value="canceladas">Canceladas</option>
+                    </select>
+                </label>
+
+            </article>
+
+        </aside>
+
+        <!-- COLUMNA CENTRAL -->
+        <section class="res-columna-central">
+
+            <article class="res-panel listado-panel">
+
+                <nav class="res-pestanas">
+
+                    <button class="res-tab activo" data-tab="todas"
+                            type="button">
+                        <i class="bi bi-calendar2-week"></i>
+                        Reservaciones
+                    </button>
+
+                    <button class="res-tab" data-tab="historial"
+                            type="button">
+                        <i class="bi bi-clock-history"></i>
+                        Historial
+                    </button>
+
+                    <button class="res-tab" data-tab="canceladas"
+                            type="button">
+                        <i class="bi bi-x-circle"></i>
+                        Canceladas
+                    </button>
+
+                </nav>
+
+                <div class="tabla-res-scroll">
+
+                    <table class="tabla-reservaciones">
+
+                        <thead>
+                            <tr>
+                                <th>Folio</th>
+                                <th>Cliente</th>
+                                <th>Mesa</th>
+                                <th>Personas</th>
+                                <th>Fecha y hora</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaReservaciones">
+                            <tr>
+                                <td colspan="6">Cargando reservaciones...</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </article>
+
+        </section>
+
+        <!-- COLUMNA DERECHA -->
+        <aside class="res-columna-derecha">
+
+            <article class="res-panel estado-mesas-panel">
+
+                <h2>
+                    <i class="bi bi-table"></i>
+                    Estado de Mesas
+                </h2>
+
+                <div class="leyenda-mesas">
+                    <span><i class="disponible"></i> Disponible</span>
+                    <span><i class="reservada"></i> Reservada</span>
+                    <span><i class="ocupada"></i> Ocupada</span>
+                </div>
+
+                <div class="mesas-grid" id="mesasGrid">
+                    <p>Cargando mesas...</p>
+                </div>
+
+            </article>
+
+        </aside>
+
+    </section>
+
+    <!-- DETALLE DE RESERVACIÓN -->
+    <section class="res-panel detalle-panel">
+
+        <div class="detalle-titulo">
+            <h2>
+                <i class="bi bi-calendar2-check"></i>
+                Detalle de la reservación
+            </h2>
+        </div>
+
+        <div id="detalleReservacion" class="detalle-contenido">
+            <p>Selecciona una reservación para consultar sus detalles.</p>
+        </div>
+
+        <div class="detalle-acciones">
+
+            <button id="btnConfirmar" class="accion-confirmar"
+                    type="button" disabled>
+                <i class="bi bi-check-circle"></i>
+                Confirmar
+            </button>
+
+            <button id="btnIniciar" class="accion-iniciar"
+                    type="button" disabled>
+                <i class="bi bi-person-check"></i>
+                Recibir cliente
+            </button>
+
+            <button id="btnLiberar" class="accion-liberar"
+                    type="button" disabled>
+                <i class="bi bi-unlock"></i>
+                Liberar mesa
+            </button>
+
+            <button id="btnCancelar" class="accion-cancelar"
+                    type="button" disabled>
+                <i class="bi bi-x-lg"></i>
+                Cancelar
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- MODAL NUEVA RESERVACIÓN -->
+    <div class="res-modal" id="modalReserva">
+
+        <div class="res-modal-contenido">
+
+            <div class="res-modal-header">
+                <h2>
+                    <i class="bi bi-calendar-plus"></i>
+                    Nueva reservación
+                </h2>
+
+                <button type="button" id="cerrarModal"
+                        aria-label="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <form id="formReserva">
+
+                <div class="res-form-grid">
+
+                    <label>
+                        Nombre del cliente
+                        <input type="text"
+                               name="nombre_cliente"
+                               required>
+                    </label>
+
+                    <label>
+                        Correo electrónico
+                        <input type="email"
+                               name="correo"
+                               required>
+                    </label>
+
+                    <label>
+                        Teléfono
+                        <input type="tel"
+                               name="telefono"
+                               required>
+                    </label>
+
+                    <label>
+                        Fecha
+                        <input type="date"
+                               name="fecha"
+                               id="fechaNuevaReserva"
+                               required>
+                    </label>
+
+                    <label>
+                        Hora de reservación
+                        <select name="hora" id="horaNuevaReserva" required>
+                            <option value="">Selecciona una hora</option>
+                            <option value="19:00">19:00 h</option>
+                            <option value="19:30">19:30 h</option>
+                            <option value="20:00">20:00 h</option>
+                            <option value="20:30">20:30 h</option>
+                            <option value="21:00">21:00 h</option>
+                            <option value="21:30">21:30 h</option>
+                            <option value="22:00">22:00 h</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Número de personas
+                        <input type="number"
+                               name="numero_personas"
+                               min="1"
+                               max="8"
+                               required>
+                    </label>
+
+                    <label class="campo-completo">
+                        Mesa
+                        <select name="id_mesa" id="selectMesa" required>
+                            <option value="">Selecciona una mesa</option>
+                        </select>
+                    </label>
+
+                    <label class="campo-completo">
+                        Observaciones
+                        <textarea name="observaciones"
+                                  rows="3"></textarea>
+                    </label>
+
+                </div>
+
+                <div class="res-modal-acciones">
+
+                    <button type="button"
+                            class="btn-secundario"
+                            id="cancelarModal">
+                        Cerrar
+                    </button>
+
+                    <button type="submit"
+                            class="btn-guardar">
+                        <i class="bi bi-check-lg"></i>
+                        Registrar reservación
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div class="res-modal-confirmacion" id="modalConfirmacion">
+
+        <div class="confirmacion-contenido">
+
+            <div class="confirmacion-icono" id="confirmacionIcono">
+                <i class="bi bi-question-circle"></i>
+            </div>
+
+            <h2 id="confirmacionTitulo">Confirmar acción</h2>
+
+            <p id="confirmacionMensaje">
+                ¿Estás seguro de realizar esta acción?
+            </p>
+
+            <div class="confirmacion-acciones">
+
+                <button type="button" id="btnCancelarConfirmacion">
+                    Volver
+                </button>
+
+                <button type="button" id="btnAceptarConfirmacion">
+                    Sí, continuar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- NOTIFICACIONES -->
+    <div class="res-toast" id="resToast"></div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    const API_RESERVACIONES =
+        "{{ url_for('administrativo.api_reservaciones_administrador') }}";
+
+    const API_CAMBIAR_ESTADO =
+        "{{ url_for('administrativo.cambiar_estado_reservacion_admin', id_reservacion=0) }}";
+
+    const URL_REGISTRAR_RESERVACION =
+        "{{ url_for('reservaciones.index') }}";
+</script>
+
+<script src="{{ url_for('static', filename='js/admin/reservaciones.js') }}"
+        defer></script>
+
+{% endblock %}

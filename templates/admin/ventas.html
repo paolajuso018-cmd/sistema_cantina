@@ -1,0 +1,424 @@
+{% extends "admin/base_admin.html" %}
+
+{% block titulo %}Ventas | La Cantina{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin/ventas.css') }}">
+{% endblock %}
+
+{% block contenido %}
+
+<div class="admin-ventas">
+
+    <!-- ENCABEZADO -->
+    <header class="ventas-titulo">
+
+        <i class="bi bi-cash-register"></i>
+
+        <div>
+            <h1>Ventas</h1>
+            <p>Supervisión y control de ventas del establecimiento.</p>
+        </div>
+
+    </header>
+
+
+    <!-- PESTAÑAS Y FILTROS -->
+    <div class="ventas-controles">
+
+        <nav class="ventas-tabs">
+
+            <button type="button"
+                    class="tab-venta activo"
+                    data-tab="resumen">
+
+                <i class="bi bi-bar-chart-fill"></i>
+                Resumen
+
+            </button>
+
+            <button type="button"
+                    class="tab-venta"
+                    data-tab="cuentas">
+
+                <i class="bi bi-table"></i>
+                Cuentas Abiertas
+
+            </button>
+
+            <button type="button"
+                    class="tab-venta"
+                    data-tab="historial">
+
+                <i class="bi bi-receipt"></i>
+                Historial de Ventas
+
+            </button>
+
+            <button type="button"
+                    class="tab-venta"
+                    data-tab="productos">
+
+                <i class="bi bi-trophy"></i>
+                Productos Más Vendidos
+
+            </button>
+
+        </nav>
+
+
+        <div class="ventas-filtros">
+
+            <label for="periodoVentas">Periodo:</label>
+
+            <select id="periodoVentas">
+                <option value="hoy">Hoy</option>
+                <option value="semana">Esta semana</option>
+                <option value="mes">Este mes</option>
+            </select>
+
+            <button type="button"
+                    class="btn-exportar"
+                    id="exportarVentas">
+
+                <i class="bi bi-download"></i>
+                Exportar
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- INDICADORES -->
+    <section class="indicadores-ventas" id="indicadoresVentas">
+
+        <article class="indicador verde">
+
+            <i class="bi bi-coin"></i>
+
+            <div>
+                <span>Ventas del día</span>
+                <strong id="ventasDia">$0.00</strong>
+            </div>
+
+        </article>
+
+
+        <article class="indicador rosa">
+
+            <i class="bi bi-receipt"></i>
+
+            <div>
+                <span>Núm. de ventas</span>
+                <strong id="numeroVentas">0</strong>
+            </div>
+
+        </article>
+
+
+        <article class="indicador amarillo">
+
+            <i class="bi bi-cup-straw"></i>
+
+            <div>
+                <span>Productos vendidos</span>
+                <strong id="productosVendidos">0</strong>
+            </div>
+
+        </article>
+
+
+        <article class="indicador lila">
+
+            <i class="bi bi-people"></i>
+
+            <div>
+                <span>Cuentas abiertas</span>
+                <strong id="cuentasAbiertas">0</strong>
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- GRÁFICAS -->
+    <section class="ventas-graficas" id="graficasVentas">
+
+
+        <!-- VENTAS DEL DÍA -->
+        <article class="panel-ventas">
+
+            <h2>
+                <i class="bi bi-bar-chart-fill"></i>
+                Ventas del día
+            </h2>
+
+            <div class="grafica-linea">
+
+                <div class="eje-y">
+                    <span>$1,500</span>
+                    <span>$1,200</span>
+                    <span>$900</span>
+                    <span>$600</span>
+                    <span>$300</span>
+                    <span>$0</span>
+                </div>
+
+
+                <svg viewBox="0 0 520 190"
+                     role="img"
+                     aria-label="Gráfica de ventas por hora">
+
+                    <defs>
+
+                        <linearGradient id="areaVentas"
+                                        x1="0"
+                                        x2="0"
+                                        y1="0"
+                                        y2="1">
+
+                            <stop offset="0"
+                                  stop-color="#c51d3a"
+                                  stop-opacity=".32"/>
+
+                            <stop offset="1"
+                                  stop-color="#c51d3a"
+                                  stop-opacity=".03"/>
+
+                        </linearGradient>
+
+                    </defs>
+
+
+                    <g class="guias">
+                        <path d="M8 10H510
+                                 M8 44H510
+                                 M8 78H510
+                                 M8 112H510
+                                 M8 146H510
+                                 M8 180H510"/>
+                    </g>
+
+
+                    <path class="area"
+                          id="areaVentasGrafica"
+                          d="M8 158 L88 137 L168 116 L248 101 L328 84 L408 30 L488 55 L488 180 L8 180Z"/>
+
+
+                    <polyline class="linea"
+                              id="lineaVentas"
+                              points="8,158 88,137 168,116 248,101 328,84 408,30 488,55"/>
+
+
+                    <g class="puntos">
+                        <circle cx="8" cy="158" r="5"/>
+                        <circle cx="88" cy="137" r="5"/>
+                        <circle cx="168" cy="116" r="5"/>
+                        <circle cx="248" cy="101" r="5"/>
+                        <circle cx="328" cy="84" r="5"/>
+                        <circle cx="408" cy="30" r="5"/>
+                        <circle cx="488" cy="55" r="5"/>
+                    </g>
+
+                </svg>
+
+
+                <div class="eje-x">
+                    <span>10:00</span>
+                    <span>12:00</span>
+                    <span>14:00</span>
+                    <span>16:00</span>
+                    <span>18:00</span>
+                    <span>20:00</span>
+                    <span>22:00</span>
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <!-- MÉTODOS DE PAGO -->
+        <article class="panel-ventas">
+
+            <h2>
+                <i class="bi bi-pie-chart-fill"></i>
+                Ventas por método de pago
+            </h2>
+
+            <div class="pagos-contenido">
+
+                <div class="dona" id="graficaDona">
+
+                    <div>
+                        <b>$0.00</b>
+                        <span>Total</span>
+                    </div>
+
+                </div>
+
+
+                <ul class="leyenda" id="leyendaPagos">
+
+                    <li>
+                        <i class="efectivo"></i>
+                        Efectivo
+                        <b>0%</b>
+                    </li>
+
+                    <li>
+                        <i class="tarjeta"></i>
+                        Tarjeta
+                        <b>0%</b>
+                    </li>
+
+                    <li>
+                        <i class="transferencia"></i>
+                        Transferencia
+                        <b>0%</b>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </article>
+
+
+        <!-- TOP PRODUCTOS -->
+        <article class="panel-ventas">
+
+            <h2>
+                <i class="bi bi-trophy"></i>
+                Top 5 productos más vendidos
+            </h2>
+
+            <ol class="top-productos" id="listaTopProductos">
+
+                <li>
+                    Cargando productos...
+                </li>
+
+            </ol>
+
+        </article>
+
+    </section>
+
+
+    <!-- TABLAS -->
+    <section class="ventas-tablas" id="tablasVentas">
+
+
+        <!-- CUENTAS ABIERTAS -->
+        <article class="panel-ventas">
+
+            <h2>
+                <i class="bi bi-table"></i>
+                Cuentas abiertas
+                (<span id="contadorCuentas">0</span>)
+            </h2>
+
+            <div class="tabla-scroll">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Mesa / Folio</th>
+                            <th>Consumo</th>
+                            <th>Apertura</th>
+                            <th>Tiempo</th>
+                            <th>Acciones</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="tablaCuentasAbiertas">
+
+                        <tr>
+                            <td colspan="6">
+                                Cargando cuentas...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </article>
+
+
+        <!-- ÚLTIMAS VENTAS -->
+        <article class="panel-ventas">
+
+            <h2>
+                <i class="bi bi-receipt"></i>
+                Últimas ventas realizadas
+            </h2>
+
+            <div class="tabla-scroll">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Folio</th>
+                            <th>Mesa / Barra</th>
+                            <th>Total</th>
+                            <th>Método de pago</th>
+                            <th>Empleado</th>
+                            <th>Hora</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="tablaUltimasVentas">
+
+                        <tr>
+                            <td colspan="6">
+                                Cargando ventas...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- NOTIFICACIONES -->
+    <div class="ventas-toast" id="ventasToast"></div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+    const URL_API_VENTAS =
+        "{{ url_for('administrativo.api_ventas_administrador') }}";
+</script>
+
+<script src="{{ url_for('static', filename='js/admin/ventas.js') }}"
+        defer></script>
+
+{% endblock %}

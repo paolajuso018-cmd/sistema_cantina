@@ -1,0 +1,536 @@
+/* PANEL DE VENTAS DEL ADMINISTRADOR - LA CANTINA */
+
+.admin-ventas {
+    width: 100%;
+    color: #65101a;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+/* ENCABEZADO */
+
+.ventas-titulo {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 0 0 18px 8px;
+}
+
+.ventas-titulo > i {
+    font-size: 48px;
+}
+
+.ventas-titulo h1 {
+    font-size: 36px;
+    margin: 0;
+}
+
+.ventas-titulo p {
+    font-size: 18px;
+    margin: 0;
+}
+
+/* CONTROLES */
+
+.ventas-controles {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.ventas-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tab-venta,
+.btn-exportar {
+    border: 1px solid #e6c5b5;
+    border-radius: 11px;
+    padding: 12px 16px;
+    background: linear-gradient(#fffaf4, #f8e9dc);
+    color: #68101a;
+    font: bold 14px Georgia;
+    cursor: pointer;
+}
+
+.tab-venta i {
+    font-size: 18px;
+    margin-right: 7px;
+}
+
+.tab-venta.activo,
+.btn-exportar {
+    background: linear-gradient(135deg, #8c1020, #650713);
+    color: white;
+    border-color: #8c1020;
+}
+
+.ventas-filtros {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: bold;
+}
+
+.ventas-filtros select {
+    padding: 11px;
+    border: 1px solid #c77b7b;
+    border-radius: 8px;
+    background: #fffaf5;
+    color: #4e1117;
+    font: 14px Georgia;
+    min-width: 160px;
+}
+
+/* INDICADORES */
+
+.indicadores-ventas {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 13px;
+}
+
+.indicador {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 94px;
+    padding: 12px 17px;
+    border: 1px solid;
+    border-radius: 14px;
+}
+
+.indicador > i {
+    font-size: 40px;
+    min-width: 48px;
+    text-align: center;
+}
+
+.indicador div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.indicador span {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.indicador strong {
+    font-size: 28px;
+    color: #570b15;
+}
+
+.indicador small {
+    color: #14732b;
+    font-weight: bold;
+}
+
+.verde {
+    background: #eaf5e5;
+    border-color: #c6dfbd;
+    color: #08702a;
+}
+
+.rosa {
+    background: #fce5e1;
+    border-color: #edc1b8;
+    color: #8d1724;
+}
+
+.amarillo {
+    background: #fff1d3;
+    border-color: #eed5a0;
+    color: #8a5710;
+}
+
+.lila {
+    background: #f3e8f3;
+    border-color: #dfc9e0;
+    color: #78152a;
+}
+
+/* GRÁFICAS */
+
+.ventas-graficas {
+    display: grid;
+    grid-template-columns: 1.35fr 1.08fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.panel-ventas {
+    min-width: 0;
+    border: 1px solid #e7c2ae;
+    border-radius: 15px;
+    background: rgba(255, 250, 244, .75);
+    padding: 10px;
+    box-shadow: 0 1px 3px #65101a0b;
+}
+
+.panel-ventas h2 {
+    font-size: 18px;
+    margin: 0 0 9px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.panel-ventas h2 i {
+    font-size: 22px;
+}
+
+/* GRÁFICA DE LÍNEAS */
+
+.grafica-linea {
+    height: 180px;
+    position: relative;
+    padding: 3px 4px 22px 48px;
+}
+
+.grafica-linea svg {
+    width: 100%;
+    height: 150px;
+}
+
+.guias path {
+    stroke: #ead8cb;
+    stroke-width: 1;
+}
+
+.area {
+    fill: url(#areaVentas);
+}
+
+.linea {
+    fill: none;
+    stroke: #a20e29;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.puntos circle {
+    fill: #fff8ef;
+    stroke: #a20e29;
+    stroke-width: 3;
+}
+
+.eje-y {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font: 11px Arial;
+    color: #24171a;
+}
+
+.eje-x {
+    display: flex;
+    justify-content: space-between;
+    margin-left: -40px;
+    font: 11px Arial;
+}
+
+/* GRÁFICA CIRCULAR */
+
+.pagos-contenido {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 8px;
+    min-height: 170px;
+}
+
+.dona {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #8f1024 0 48%,
+        #e5a300 48% 80%,
+        #26983b 80% 100%
+    );
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.dona:before {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #fffaf4;
+}
+
+.dona div {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: #201317;
+}
+
+.dona b {
+    font-size: 17px;
+}
+
+.dona span {
+    font-size: 14px;
+}
+
+.leyenda {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 16px;
+    min-width: 130px;
+    color: #21151a;
+    font-size: 13px;
+}
+
+.leyenda li {
+    display: grid;
+    grid-template-columns: 12px 1fr auto;
+    align-items: center;
+    gap: 7px;
+}
+
+.leyenda li i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.leyenda li b {
+    margin-left: 8px;
+}
+
+.efectivo {
+    background: #8f1024;
+}
+
+.tarjeta {
+    background: #e5a300;
+}
+
+.transferencia {
+    background: #26983b;
+}
+
+/* TOP PRODUCTOS */
+
+.top-productos {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.top-productos li {
+    display: grid;
+    grid-template-columns: 38px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid #eeded3;
+    color: #21151a;
+    font-size: 13px;
+}
+
+.top-productos li:last-child {
+    border: 0;
+}
+
+.top-productos strong {
+    font-size: 12px;
+}
+
+.producto {
+    width: 36px;
+    height: 31px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 19px;
+    background: linear-gradient(135deg, #6e1716, #d69b37);
+}
+
+.p2 {
+    background: linear-gradient(135deg, #7a3b0d, #e6a51c);
+}
+
+.p3 {
+    background: linear-gradient(135deg, #a81e44, #f7a5b7);
+}
+
+.p4 {
+    background: linear-gradient(135deg, #61230f, #d97824);
+}
+
+.p5 {
+    background: linear-gradient(135deg, #427c24, #e5b62a);
+}
+
+/* TABLAS */
+
+.ventas-tablas {
+    display: grid;
+    grid-template-columns: 1fr 1.08fr;
+    gap: 12px;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+}
+
+.panel-ventas table {
+    border-collapse: collapse;
+    width: 100%;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #1e1516;
+}
+
+.panel-ventas th {
+    background: #790d1b;
+    color: white;
+    padding: 6px 7px;
+}
+
+.panel-ventas th:first-child {
+    border-radius: 7px 0 0 7px;
+}
+
+.panel-ventas th:last-child {
+    border-radius: 0 7px 7px 0;
+}
+
+.panel-ventas td {
+    padding: 6px 7px;
+    text-align: center;
+    border-bottom: 1px solid #ead8ca;
+}
+
+.btn-ver {
+    border: 1px solid #d98780;
+    border-radius: 7px;
+    background: #fff0e9;
+    color: #7c1420;
+    padding: 3px 12px;
+    font: 12px Georgia;
+    cursor: pointer;
+}
+
+.btn-ver:hover {
+    background: #f6d8ce;
+}
+
+/* AVISOS */
+
+.nota-demo {
+    font: 12px Arial;
+    color: #765b50;
+    margin: 10px 2px;
+}
+
+.ventas-toast {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    background: #68101a;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 9px;
+    opacity: 0;
+    transition: .2s;
+    z-index: 9999;
+}
+
+.ventas-toast.visible {
+    opacity: 1;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1250px) {
+    .ventas-graficas {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ventas-graficas > .panel-ventas:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .indicador {
+        padding: 10px;
+    }
+
+    .indicador > i {
+        font-size: 32px;
+    }
+
+    .indicador strong {
+        font-size: 23px;
+    }
+}
+
+@media(max-width:900px) {
+    .indicadores-ventas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ventas-graficas,
+    .ventas-tablas {
+        grid-template-columns: 1fr;
+    }
+
+    .ventas-graficas > .panel-ventas:last-child {
+        grid-column: auto;
+    }
+}
+
+@media(max-width:560px) {
+    .ventas-titulo h1 {
+        font-size: 29px;
+    }
+
+    .ventas-titulo p {
+        font-size: 15px;
+    }
+
+    .indicadores-ventas {
+        grid-template-columns: 1fr;
+    }
+
+    .ventas-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .tab-venta {
+        padding: 9px 6px;
+        font-size: 12px;
+    }
+
+    .ventas-filtros {
+        flex-wrap: wrap;
+    }
+
+    .pagos-contenido {
+        flex-wrap: wrap;
+    }
+}

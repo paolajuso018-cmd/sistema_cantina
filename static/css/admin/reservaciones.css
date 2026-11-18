@@ -1,0 +1,834 @@
+/* ==========================================
+   RESERVACIONES - LA CANTINA
+========================================== */
+
+.admin-reservaciones {
+    color: #650d17;
+    width: 100%;
+    padding: 8px 2px 25px;
+    box-sizing: border-box;
+}
+
+.admin-reservaciones * {
+    box-sizing: border-box;
+}
+
+.res-header {
+    margin-bottom: 20px;
+}
+
+.res-titulo {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+}
+
+.res-titulo > i {
+    font-size: 48px;
+}
+
+.res-titulo h1 {
+    font-family: Georgia, serif;
+    font-size: 34px;
+    margin: 0;
+    color: #710b17;
+}
+
+.res-titulo p {
+    margin: 2px 0 0;
+    font-size: 16px;
+    color: #6c171b;
+}
+
+/* INDICADORES */
+
+.res-indicadores {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr)) auto;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: stretch;
+}
+
+.res-indicador {
+    min-height: 88px;
+    border-radius: 15px;
+    padding: 13px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    border: 1px solid rgba(100, 20, 20, .08);
+}
+
+.res-indicador > i {
+    font-size: 35px;
+}
+
+.res-indicador span {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.res-indicador strong {
+    display: block;
+    font-family: Georgia, serif;
+    font-size: 29px;
+    margin-top: 2px;
+}
+
+.res-indicador.rosa {
+    background: #fbe2df;
+}
+
+.res-indicador.amarillo {
+    background: #fff0d4;
+}
+
+.res-indicador.verde {
+    background: #e4f3d9;
+}
+
+.res-indicador.lila {
+    background: #f3e4f4;
+}
+
+.btn-nueva-reserva {
+    background: #780b19;
+    color: white;
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 170px;
+}
+
+.btn-nueva-reserva:hover,
+.btn-guardar:hover {
+    background: #970e22;
+}
+
+/* DISTRIBUCIÓN */
+
+.res-layout {
+    display: grid;
+    grid-template-columns: minmax(235px, .85fr) minmax(370px, 1.55fr) minmax(280px, 1.25fr);
+    gap: 13px;
+    align-items: start;
+}
+
+.res-columna-izquierda,
+.res-columna-central,
+.res-columna-derecha {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.res-panel {
+    background: rgba(255, 250, 241, .72);
+    border: 1px solid #ead1c2;
+    border-radius: 15px;
+    padding: 13px;
+    min-width: 0;
+}
+
+.res-panel h2 {
+    font-family: Georgia, serif;
+    font-size: 21px;
+    margin: 0 0 13px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #6f0d17;
+}
+
+/* CALENDARIO */
+
+.calendario-panel {
+    padding: 10px;
+}
+
+.calendario-cabecera {
+    background: #780b19;
+    color: white;
+    border-radius: 10px;
+    height: 47px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.calendario-cabecera h2 {
+    color: white;
+    margin: 0;
+    font-size: 17px;
+}
+
+.calendario-cabecera button {
+    color: white;
+    background: transparent;
+    border: 0;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.calendario-dias,
+.calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.calendario-dias {
+    margin-top: 12px;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+.calendario-grid {
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.dia-calendario {
+    border: 0;
+    background: transparent;
+    border-radius: 7px;
+    min-height: 34px;
+    cursor: pointer;
+    color: #3d2924;
+    font-size: 13px;
+    position: relative;
+}
+
+.dia-calendario:hover {
+    background: #f4d9ce;
+}
+
+.dia-calendario.seleccionado {
+    background: #820d1c;
+    color: white;
+}
+
+.dia-calendario.hoy {
+    outline: 1px solid #9c2631;
+}
+
+.dia-calendario.tiene-reservas::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #d29a20;
+    bottom: 2px;
+    left: calc(50% - 2px);
+}
+
+/* FILTROS */
+
+.filtros-panel h2 {
+    margin-bottom: 13px;
+}
+
+.filtros-panel label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 11px;
+}
+
+.filtros-panel label > i {
+    font-size: 21px;
+}
+
+.filtros-panel select {
+    width: 100%;
+    min-width: 0;
+    padding: 9px;
+    border: 1px solid #e4cabe;
+    background: #fffdfa;
+    border-radius: 9px;
+    color: #30231f;
+}
+
+/* PESTAÑAS */
+
+.res-pestanas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+    margin-bottom: 14px;
+}
+
+.res-tab {
+    border: 1px solid #efded4;
+    background: transparent;
+    border-radius: 10px;
+    padding: 12px 5px;
+    color: #680d17;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.res-tab.activo {
+    background: #790c1a;
+    color: white;
+    border-color: #790c1a;
+}
+
+/* TABLA */
+
+.tabla-res-scroll {
+    overflow-x: auto;
+}
+
+.tabla-reservaciones {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 520px;
+}
+
+.tabla-reservaciones th {
+    background: #790c1a;
+    color: white;
+    padding: 10px 7px;
+    white-space: nowrap;
+}
+
+.tabla-reservaciones th:first-child {
+    border-radius: 8px 0 0 0;
+}
+
+.tabla-reservaciones th:last-child {
+    border-radius: 0 8px 0 0;
+}
+
+.tabla-reservaciones td {
+    padding: 11px 7px;
+    border-bottom: 1px solid #eadfd6;
+    text-align: center;
+    color: #2e2522;
+}
+
+.fila-reservacion {
+    cursor: pointer;
+}
+
+.fila-reservacion:hover,
+.fila-reservacion.seleccionada {
+    background: #f9e8df;
+}
+
+.estado-res {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.estado-res.reservada {
+    background: #ffedbd;
+    color: #795000;
+}
+
+.estado-res.confirmada {
+    background: #c9edb6;
+    color: #245b16;
+}
+
+.estado-res.encurso {
+    background: #f3c8c8;
+    color: #861e28;
+}
+
+.estado-res.finalizada {
+    background: #dedede;
+    color: #444;
+}
+
+.estado-res.cancelada {
+    background: #f1d1d1;
+    color: #8d1d1d;
+}
+
+/* MESAS */
+
+.estado-mesas-panel h2 {
+    margin-bottom: 12px;
+}
+
+.leyenda-mesas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+}
+
+.leyenda-mesas span {
+    border: 1px solid #eee1d7;
+    border-radius: 8px;
+    padding: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.leyenda-mesas i {
+    width: 13px;
+    height: 13px;
+    border-radius: 4px;
+}
+
+.disponible {
+    background: #48ae49;
+}
+
+.reservada {
+    background: #f4c34f;
+}
+
+.ocupada {
+    background: #d77a7a;
+}
+
+.mesas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.mesa-card {
+    border-radius: 13px;
+    border: 1px solid transparent;
+    padding: 12px 7px;
+    text-align: center;
+    min-width: 0;
+}
+
+.mesa-card.disponible {
+    background: #e4f3d9;
+    border-color: #b9dba7;
+}
+
+.mesa-card.reservada {
+    background: #fff0d1;
+    border-color: #f1d18a;
+}
+
+.mesa-card.ocupada {
+    background: #f9dddd;
+    border-color: #e7b1b1;
+}
+
+.mesa-card h3 {
+    font-family: Georgia, serif;
+    margin: 0 0 7px;
+    font-size: 16px;
+}
+
+.mesa-card p {
+    margin: 4px 0;
+    color: #33231d;
+    font-size: 12px;
+}
+
+.mesa-card strong {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .55);
+    font-size: 12px;
+}
+
+/* DETALLE */
+
+.detalle-panel {
+    margin-top: 14px;
+}
+
+.detalle-contenido {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.detalle-dato {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    color: #3b2821;
+    font-size: 14px;
+    padding: 5px;
+}
+
+.detalle-dato i {
+    color: #780b19;
+    font-size: 18px;
+}
+
+.detalle-dato strong {
+    color: #710d19;
+    margin-right: 5px;
+}
+
+.detalle-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.detalle-acciones button {
+    border-radius: 9px;
+    padding: 10px 15px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid #790c1a;
+}
+
+.detalle-acciones button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.accion-confirmar,
+.accion-iniciar,
+.accion-liberar {
+    background: #790c1a;
+    color: white;
+}
+
+.accion-cancelar {
+    background: transparent;
+    color: #790c1a;
+}
+
+/* MODAL NUEVA RESERVACIÓN */
+
+.res-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(30, 0, 0, .58);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.res-modal.abierto {
+    display: flex;
+}
+
+.res-modal-contenido {
+    background: #fffaf2;
+    border-radius: 16px;
+    width: min(650px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 22px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, .25);
+}
+
+.res-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.res-modal-header h2 {
+    margin: 0;
+    color: #790c1a;
+    font-family: Georgia, serif;
+}
+
+.res-modal-header button {
+    border: 0;
+    background: transparent;
+    font-size: 22px;
+    cursor: pointer;
+    color: #790c1a;
+}
+
+.res-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.res-form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #650d17;
+}
+
+.res-form-grid input,
+.res-form-grid select,
+.res-form-grid textarea {
+    width: 100%;
+    border: 1px solid #dfc9bd;
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    font: inherit;
+    color: #32231e;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+.res-modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secundario,
+.btn-guardar {
+    border-radius: 8px;
+    padding: 11px 15px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-secundario {
+    background: transparent;
+    color: #790c1a;
+    border: 1px solid #790c1a;
+}
+
+.btn-guardar {
+    background: #790c1a;
+    color: white;
+    border: 0;
+}
+
+/* MODAL DE CONFIRMACIÓN */
+
+.res-modal-confirmacion {
+    position: fixed;
+    inset: 0;
+    background: rgba(35, 5, 8, 0.68);
+    backdrop-filter: blur(4px);
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.res-modal-confirmacion.visible {
+    display: flex;
+    animation: aparecerModal .2s ease;
+}
+
+.confirmacion-contenido {
+    background: #fffaf1;
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 18px;
+    text-align: center;
+    border: 1px solid #e8cdbb;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, .3);
+    animation: subirModal .25s ease;
+}
+
+.confirmacion-icono {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    background: #f8e7c8;
+    color: #8a591c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.confirmacion-contenido h2 {
+    font-family: Georgia, serif;
+    color: #790c1a;
+    font-size: 23px;
+    margin: 0 0 12px;
+}
+
+.confirmacion-contenido p {
+    color: #59433b;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.confirmacion-acciones {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.confirmacion-acciones button {
+    border-radius: 9px;
+    padding: 11px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+}
+
+#btnCancelarConfirmacion {
+    background: transparent;
+    border: 1px solid #790c1a;
+    color: #790c1a;
+}
+
+#btnCancelarConfirmacion:hover {
+    background: #f5e4df;
+}
+
+#btnAceptarConfirmacion {
+    background: #790c1a;
+    border: 1px solid #790c1a;
+    color: white;
+}
+
+#btnAceptarConfirmacion:hover {
+    background: #9b1728;
+}
+
+/* NOTIFICACIONES */
+
+.res-toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #710c18;
+    color: white;
+    padding: 13px 20px;
+    border-radius: 10px;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: .2s;
+    max-width: 90vw;
+}
+
+.res-toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ANIMACIONES */
+
+@keyframes aparecerModal {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes subirModal {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1150px) {
+    .res-indicadores {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
+
+    .btn-nueva-reserva {
+        min-height: 65px;
+    }
+
+    .res-layout {
+        grid-template-columns: minmax(220px, .8fr) minmax(0, 1.5fr);
+    }
+
+    .res-columna-derecha {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .res-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .res-columna-derecha {
+        grid-column: auto;
+    }
+
+    .res-indicadores {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .res-indicador {
+        min-height: 75px;
+    }
+
+    .res-titulo h1 {
+        font-size: 26px;
+    }
+
+    .detalle-contenido {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .res-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo {
+        grid-column: auto;
+    }
+
+    .detalle-acciones button {
+        flex: 1 1 45%;
+    }
+
+    .res-pestanas {
+        grid-template-columns: 1fr;
+    }
+
+    .res-modal-contenido {
+        padding: 16px;
+    }
+
+    .res-modal-acciones {
+        flex-direction: column-reverse;
+    }
+
+    .res-modal-acciones button {
+        width: 100%;
+    }
+}
