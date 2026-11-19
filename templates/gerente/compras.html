@@ -1,0 +1,531 @@
+
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Compras | La Cantina{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/gerente/compras.css') }}">
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="compras-contenedor">
+
+    <!-- =====================================
+         ENCABEZADO
+    ====================================== -->
+
+    <div class="compras-encabezado">
+
+        <div class="compras-titulo">
+
+            <div class="compras-icono-principal">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+
+            <div>
+                <h1>Compras</h1>
+                <p>Gestión de pedidos de insumos para el abastecimiento de La Cantina.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         TARJETAS DE ESTADÍSTICAS
+    ====================================== -->
+
+    <section class="compras-estadisticas">
+
+        <!-- Insumos con bajo stock -->
+
+        <article class="tarjeta-compra tarjeta-bajo-stock">
+
+            <div class="estadistica-icono">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+
+            <div class="estadistica-informacion">
+                <span>Insumos con bajo stock</span>
+                <strong>{{ total_bajo_stock }}</strong>
+            </div>
+
+        </article>
+
+
+        <!-- Pedidos pendientes -->
+
+        <article class="tarjeta-compra tarjeta-pedidos">
+
+            <div class="estadistica-icono">
+                <i class="fas fa-box"></i>
+            </div>
+
+            <div class="estadistica-informacion">
+                <span>Pedidos en proceso</span>
+                <strong>{{ pedidos_en_proceso }}</strong>
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =====================================
+         DISTRIBUCIÓN PRINCIPAL
+    ====================================== -->
+
+    <div class="compras-distribucion">
+
+
+        <!-- =================================
+             COLUMNA IZQUIERDA
+        ================================== -->
+
+        <section class="compras-panel panel-insumos">
+
+            <div class="panel-encabezado">
+
+                <h2>
+                    <i class="fas fa-box-open"></i>
+                    Productos en bajo stock
+                </h2>
+
+                <span class="contador-insumos">
+                    {{ total_bajo_stock }} insumos
+                </span>
+
+            </div>
+
+
+            <!-- Tabla de insumos -->
+
+            <div class="tabla-compras-contenedor">
+
+                <table class="tabla-compras">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Insumo</th>
+                            <th>Categoría</th>
+                            <th>Unidad</th>
+                            <th>Stock actual</th>
+                            <th>Stock mín.</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for insumo in insumos_bajo_stock %}
+
+                        <tr>
+
+                            <td>{{ loop.index }}</td>
+
+                            <td class="nombre-insumo">
+                                {{ insumo.nombre }}
+                            </td>
+
+                            <td>
+                                {{ insumo.categoria }}
+                            </td>
+
+                            <td>
+                                {{ insumo.abreviatura }}
+                            </td>
+
+                            <td>
+                                <span class="
+                                    {% if insumo.stock_actual <= 0 %}
+                                        stock-sin-existencia
+                                    {% else %}
+                                        stock-bajo
+                                    {% endif %}
+                                ">
+                                    {{ "%.2f"|format(insumo.stock_actual) }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ "%.2f"|format(insumo.stock_minimo) }}
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="6" class="tabla-vacia">
+
+                                <i class="fas fa-check-circle"></i>
+
+                                <p>No hay insumos con bajo stock.</p>
+
+                                <span>El inventario se encuentra en niveles adecuados.</span>
+
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- Nota informativa -->
+
+            <div class="nota-stock">
+
+                <i class="fas fa-info-circle"></i>
+
+                <span>
+                    Los insumos se muestran automáticamente cuando su stock
+                    actual es menor o igual al stock mínimo.
+                </span>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             COLUMNA DERECHA
+             FORMULARIO DE PEDIDO
+        ================================== -->
+
+        <section class="compras-panel panel-realizar-pedido">
+
+            <div class="panel-encabezado">
+
+                <h2>
+                    <i class="far fa-calendar-check"></i>
+                    Realizar Pedido
+                </h2>
+
+            </div>
+
+
+            <form id="formGenerarPedido"
+                  class="formulario-pedido"
+                  autocomplete="off">
+
+
+                <!-- PROVEEDOR -->
+
+                <div class="campo-pedido">
+
+                    <label for="proveedorPedido">
+                        Proveedor <span>*</span>
+                    </label>
+
+                    <select id="proveedorPedido"
+                            name="id_proveedor"
+                            required>
+
+                        <option value="">
+                            Selecciona un proveedor
+                        </option>
+
+                        {% for proveedor in proveedores %}
+
+                        <option value="{{ proveedor.id_proveedor }}">
+                            {{ proveedor.nombre }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <small class="mensaje-campo" id="mensajeProveedor"></small>
+
+                </div>
+
+
+                <!-- FECHA DE ENTREGA -->
+
+                <div class="campo-pedido">
+
+                    <label for="fechaEntrega">
+                        Fecha de entrega <span>*</span>
+                    </label>
+
+                    <div class="campo-con-icono">
+
+                        <i class="far fa-calendar-alt"></i>
+
+                        <input type="date"
+                               id="fechaEntrega"
+                               name="fecha_entrega"
+                               min="{{ '' }}"
+                               required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INSUMOS DEL PEDIDO -->
+
+                <div class="pedido-insumos-encabezado">
+
+                    <h3>
+                        Insumos del pedido <span>*</span>
+                    </h3>
+
+                    <button type="button"
+                            class="btn-agregar-insumo"
+                            id="btnAgregarInsumo">
+
+                        <i class="fas fa-plus"></i>
+                        Agregar Insumo
+
+                    </button>
+
+                </div>
+
+
+                <!-- TABLA DEL PEDIDO -->
+
+                <div class="tabla-pedido-contenedor">
+
+                    <table class="tabla-pedido">
+
+                        <thead>
+                            <tr>
+                                <th>Insumo</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaInsumosPedido">
+
+                            <tr id="pedidoVacio">
+
+                                <td colspan="4" class="pedido-sin-insumos">
+
+                                    <i class="fas fa-box-open"></i>
+
+                                    <p>Aún no hay insumos agregados.</p>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- TOTAL ESTIMADO -->
+
+                <div class="pedido-total">
+
+                    <span>Total estimado:</span>
+
+                    <strong id="totalPedido">$0.00</strong>
+
+                </div>
+
+
+                <!-- OBSERVACIONES -->
+
+                <div class="campo-pedido campo-observaciones">
+
+                    <label for="observacionesPedido">
+                        Observaciones
+                    </label>
+
+                    <textarea id="observacionesPedido"
+                              name="observaciones"
+                              rows="3"
+                              maxlength="2000"
+                              placeholder="Indica alguna nota del pedido..."></textarea>
+
+                </div>
+
+
+                <!-- MENSAJE DE ESTADO -->
+
+                <div id="mensajeCompras"
+                     class="mensaje-compras"
+                     role="alert"
+                     aria-live="polite">
+                </div>
+
+
+                <!-- BOTONES -->
+
+                <div class="acciones-pedido">
+
+                    <button type="button"
+                            class="btn-cancelar-pedido"
+                            id="btnCancelarPedido">
+
+                        <i class="fas fa-times"></i>
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn-generar-pedido"
+                            id="btnGenerarPedido">
+
+                        <i class="far fa-paper-plane"></i>
+                        Generar Pedido
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     MODAL PARA AGREGAR INSUMOS
+========================================== -->
+
+<div class="modal-compras-overlay"
+     id="modalAgregarInsumo">
+
+    <div class="modal-compras">
+
+        <div class="modal-compras-encabezado">
+
+            <h2>
+                <i class="fas fa-box-open"></i>
+                Agregar Insumo
+            </h2>
+
+            <button type="button"
+                    class="cerrar-modal-compras"
+                    id="cerrarModalInsumo"
+                    aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+
+        </div>
+
+
+        <div class="modal-compras-cuerpo">
+
+            <p class="modal-descripcion">
+                Selecciona un insumo del proveedor y especifica la cantidad que necesitas.
+            </p>
+
+
+            <div class="campo-pedido">
+
+                <label for="seleccionarInsumo">
+                    Insumo <span>*</span>
+                </label>
+
+                <select id="seleccionarInsumo">
+
+                    <option value="">
+                        Primero selecciona un proveedor
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="campo-pedido">
+
+                <label for="cantidadInsumo">
+                    Cantidad solicitada <span>*</span>
+                </label>
+
+                <input type="number"
+                       id="cantidadInsumo"
+                       min="0.001"
+                       step="0.001"
+                       placeholder="Ej. 5.000">
+
+            </div>
+
+
+            <div class="informacion-insumo"
+                 id="informacionInsumo"
+                 hidden>
+
+                <div>
+                    <span>Unidad:</span>
+                    <strong id="unidadInsumo">-</strong>
+                </div>
+
+                <div>
+                    <span>Stock actual:</span>
+                    <strong id="stockInsumo">0.000</strong>
+                </div>
+
+                <div>
+                    <span>Costo unitario:</span>
+                    <strong id="costoInsumo">$0.00</strong>
+                </div>
+
+            </div>
+
+
+            <div class="botones-modal-compras">
+
+                <button type="button"
+                        class="btn-modal-cancelar"
+                        id="cancelarModalInsumo">
+                    Cancelar
+                </button>
+
+                <button type="button"
+                        class="btn-modal-agregar"
+                        id="confirmarAgregarInsumo">
+                    <i class="fas fa-plus"></i>
+                    Agregar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     NOTIFICACIONES
+========================================== -->
+
+<div id="notificacionCompras"
+     class="notificacion-compras"
+     role="status"
+     aria-live="polite">
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/gerente/compras.js') }}"></script>
+
+{% endblock %}

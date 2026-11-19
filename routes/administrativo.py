@@ -39,11 +39,11 @@ MENUS_ROLES = {
 
     "Gerente": [
         {"nombre": "Inicio", "icono": "bi-house-door", "url": "#"},
-        {"nombre": "Personal", "icono": "bi-people", "url": "#"},
-        {"nombre": "Ventas", "icono": "bi-cash-stack", "url": "#"},
-        {"nombre": "Reservaciones", "icono": "bi-calendar-check", "url": "#"},
-        {"nombre": "Almacén", "icono": "bi-box-seam", "url": "#"},
-        {"nombre": "Reportes", "icono": "bi-bar-chart", "url": "#"}
+        {"nombre": "Personal", "icono": "bi-people", "url": "/usuarios/"},
+        {"nombre": "Ventas", "icono": "bi-cash-stack", "url": "/admin/ventas"},
+        {"nombre": "Reservaciones", "icono": "bi-calendar-check", "url": "/admin/reservaciones"},
+        {"nombre": "Almacén", "icono": "bi-box-seam", "url": "/almacen/"},
+        {"nombre": "Compras", "icono": "bi-cart3", "url": "/gerente/compras/"}
     ],
 
     "Cajero": [
@@ -67,14 +67,13 @@ MENUS_ROLES = {
         {"nombre": "Pedidos de barra", "icono": "bi-cup-straw", "url": "#"},
         {"nombre": "En preparación", "icono": "bi-hourglass-split", "url": "#"},
         {"nombre": "Pedidos listos", "icono": "bi-check-circle", "url": "#"},
-        {"nombre": "Recetas", "icono": "bi-journal-text", "url": "#"}
+        {"nombre": "Recetas", "icono": "bi-journal-text", "url": "/recetas/"}
     ],
 
     "Recepcionista": [
         {"nombre": "Inicio", "icono": "bi-house-door", "url": "#"},
-        {"nombre": "Reservaciones", "icono": "bi-calendar-check", "url": "#"},
+        {"nombre": "Reservaciones", "icono": "bi-calendar-check", "url": "/admin/reservaciones"},
         {"nombre": "Plano de mesas", "icono": "bi-grid-3x3", "url": "#"},
-        {"nombre": "Registro de clientes", "icono": "bi-person-plus", "url": "#"}
     ]
 
 }
@@ -387,7 +386,7 @@ def ventas_administrador():
 
     rol = session.get("rol", "")
 
-    if rol != "Administrador":
+    if rol not in ["Administrador", "Gerente"]:
         flash("No tienes permiso para acceder a esta sección.", "error")
         return redirect(url_for("login.login"))
 
@@ -414,7 +413,7 @@ def api_ventas_administrador():
 
     rol = str(session.get("rol", "")).strip().lower()
 
-    if rol != "administrador":
+    if rol not in ["Administrador", "gerente"]:
         return jsonify({
             "ok": False,
             "mensaje": "No tienes permiso."

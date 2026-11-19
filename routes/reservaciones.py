@@ -1,3 +1,5 @@
+import uuid
+
 from flask import (
     Blueprint,
     render_template,
@@ -670,8 +672,10 @@ def vista_previa():
             500
         )
 
-    # ==========================================
+
+# ==========================================
 # ACTUALIZAR ESTADO DE UNA RESERVACIÓN
+# AL RECIBIR CLIENTE, ABRIR CUENTA AUTOMÁTICA
 # ==========================================
 
 @reservaciones_bp.route(
@@ -688,14 +692,14 @@ def actualizar_estado_reservacion(id_reservacion):
 
     rol = str(session.get("rol", "")).strip().lower()
 
-    if rol not in ["administrador", "gerente"]:
+    if rol not in ["administrador", "gerente", "recepcionista"]:
         return jsonify({
             "ok": False,
             "mensaje": "No tienes autorización."
         }), 403
 
     datos = request.get_json(silent=True) or {}
-    nuevo_estado = datos.get("estado", "").strip()
+    nuevo_estado = str(datos.get("estado", "")).strip()
 
     estados_permitidos = [
         "Confirmada",
@@ -714,14 +718,24 @@ def actualizar_estado_reservacion(id_reservacion):
     cursor = None
 
     try:
-
         conexion = obtener_conexion()
+
+        if conexion is None:
+            raise Exception("No fue posible conectar con MySQL.")
+
         cursor = conexion.cursor()
 
+        # Obtener los datos de la reservación y bloquear el registro.
         cursor.execute("""
-            SELECT estado
-            FROM reservaciones
-            WHERE id_reservacion = %s
+            SELECT
+                r.estado,
+                r.id_mesa,
+                c.nombre
+            FROM reservaciones r
+            INNER JOIN clientes c
+                ON c.id_cliente = r.id_cliente
+            WHERE r.id_reservacion = %s
+            FOR UPDATE
         """, (id_reservacion,))
 
         reservacion = cursor.fetchone()
@@ -732,34 +746,115 @@ def actualizar_estado_reservacion(id_reservacion):
                 "mensaje": "La reservación no existe."
             }), 404
 
-        estado_actual = reservacion[0]
+        estado_actual, id_mesa, nombre_cliente = reservacion
 
-        if estado_actual not in [
-            "Reservada",
-            "Confirmada",
-            "En curso"
-        ]:
+        if estado_actual in ["Finalizada", "Cancelada"]:
             return jsonify({
                 "ok": False,
-                "mensaje": "Esta reservación ya no está activa."
+                "mensaje": "Esta reservación ya está cerrada."
             }), 400
+
+        id_venta = None
+        folio = None
+
+        # ======================================
+        # RECIBIR CLIENTE Y ABRIR CUENTA
+        # ======================================
+
+        if nuevo_estado == "En curso":
+
+            # Comprobar si ya existe una cuenta abierta para esa mesa.
+            cursor.execute("""
+                SELECT id_venta, folio
+                FROM ventas
+                WHERE id_mesa = %s
+                  AND tipo_cuenta = 'Mesa'
+                  AND estado = 'Abierta'
+                LIMIT 1
+                FOR UPDATE
+            """, (id_mesa,))
+
+            cuenta_existente = cursor.fetchone()
+
+            if cuenta_existente:
+
+                if estado_actual == "En curso":
+                    id_venta, folio = cuenta_existente
+
+                else:
+                    return jsonify({
+                        "ok": False,
+                        "mensaje": (
+                            "La mesa ya tiene una cuenta abierta. "
+                            "Revisa la mesa antes de recibir esta reservación."
+                        )
+                    }), 409
+
+            else:
+
+                folio = (
+                    "LC-"
+                    + datetime.now().strftime("%y%m%d")
+                    + "-"
+                    + uuid.uuid4().hex[:6].upper()
+                )
+
+                cursor.execute("""
+                    INSERT INTO ventas (
+                        id_usuario,
+                        tipo_cuenta,
+                        id_mesa,
+                        nombre_cliente,
+                        folio,
+                        subtotal,
+                        total,
+                        metodo_pago,
+                        estado
+                    )
+                    VALUES (
+                        %s, 'Mesa', %s, %s, %s,
+                        0, 0, NULL, 'Abierta'
+                    )
+                """, (
+                    session["id_usuario"],
+                    id_mesa,
+                    nombre_cliente,
+                    folio
+                ))
+
+                id_venta = cursor.lastrowid
+
+        # ======================================
+        # ACTUALIZAR ESTADO DE LA RESERVACIÓN
+        # ======================================
 
         cursor.execute("""
             UPDATE reservaciones
             SET estado = %s
             WHERE id_reservacion = %s
-        """, (nuevo_estado, id_reservacion))
+        """, (
+            nuevo_estado,
+            id_reservacion
+        ))
 
         conexion.commit()
 
+        mensajes = {
+            "Confirmada": "Reservación confirmada.",
+            "En curso": (
+                "Cliente recibido. "
+                "La cuenta de la mesa se abrió correctamente."
+            ),
+            "Finalizada": "Reservación finalizada.",
+            "Cancelada": "Reservación cancelada."
+        }
+
         return jsonify({
             "ok": True,
-            "mensaje": (
-                "Mesa liberada correctamente."
-                if nuevo_estado == "Finalizada"
-                else "Estado actualizado correctamente."
-            ),
-            "estado": nuevo_estado
+            "mensaje": mensajes[nuevo_estado],
+            "estado": nuevo_estado,
+            "id_venta": id_venta,
+            "folio": folio
         })
 
     except Exception as error:
@@ -767,11 +862,17 @@ def actualizar_estado_reservacion(id_reservacion):
         if conexion:
             conexion.rollback()
 
-        print("ERROR AL ACTUALIZAR RESERVACIÓN:", repr(error))
+        print(
+            "ERROR AL ACTUALIZAR RESERVACIÓN / ABRIR CUENTA:",
+            repr(error)
+        )
 
         return jsonify({
             "ok": False,
-            "mensaje": "No fue posible actualizar la reservación."
+            "mensaje": (
+                "No fue posible actualizar la reservación "
+                "ni abrir la cuenta."
+            )
         }), 500
 
     finally:
@@ -781,3 +882,4 @@ def actualizar_estado_reservacion(id_reservacion):
 
         if conexion:
             conexion.close()
+    

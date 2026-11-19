@@ -20,6 +20,7 @@ from routes.recetas import recetas_bp
 from routes.ventas import ventas_bp
 from routes.compras import compras_bp
 from routes.proveedores import proveedores_bp
+from routes.compras_gerente import compras_gerente_bp
 
 
 # ==========================================
@@ -36,6 +37,7 @@ app.register_blueprint(recetas_bp)
 app.register_blueprint(ventas_bp)
 app.register_blueprint(compras_bp)
 app.register_blueprint(proveedores_bp)
+app.register_blueprint(compras_gerente_bp)
 
 
 

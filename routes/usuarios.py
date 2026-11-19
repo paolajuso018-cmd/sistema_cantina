@@ -11,6 +11,8 @@ from routes.administrativo import MENUS_ROLES
 
 usuarios_bp = Blueprint("usuarios", __name__)
 
+ROLES_GESTION_USUARIOS = ["Administrador", "Gerente"]
+
 
 # ==========================================
 # GESTIÓN DE USUARIOS
@@ -24,7 +26,7 @@ def gestionar_usuarios():
         return redirect(url_for("login.login"))
 
     # Solo administrador puede gestionar usuarios
-    if session.get("rol") != "Administrador":
+    if session.get("rol") not in ROLES_GESTION_USUARIOS:
         flash("No tienes permiso para gestionar usuarios.", "error")
         return redirect(url_for("administrativo.dashboard"))
 
@@ -219,7 +221,7 @@ def gestionar_usuarios():
     return render_template(
         "admin/usuarios.html",
         nombre=session.get("nombre", "Administrador"),
-        menu=MENUS_ROLES["Administrador"],
+        menu=MENUS_ROLES.get(session.get("rol"), []),
         usuarios=usuarios,
         roles=roles,
         estadisticas=estadisticas,
@@ -242,7 +244,7 @@ def nuevo_usuario():
     if "id_usuario" not in session:
         return redirect(url_for("login.login"))
 
-    if session.get("rol") != "Administrador":
+    if session.get("rol") not in ROLES_GESTION_USUARIOS:
         flash("No tienes permiso para registrar usuarios.", "error")
         return redirect(url_for("administrativo.dashboard"))
 
@@ -361,7 +363,7 @@ def editar_usuario(id_usuario):
     if "id_usuario" not in session:
         return redirect(url_for("login.login"))
 
-    if session.get("rol") != "Administrador":
+    if session.get("rol") not in ROLES_GESTION_USUARIOS:
         flash("No tienes permiso para editar usuarios.", "error")
         return redirect(url_for("administrativo.dashboard"))
 
@@ -519,7 +521,7 @@ def eliminar_usuario(id_usuario):
     if "id_usuario" not in session:
         return redirect(url_for("login.login"))
 
-    if session.get("rol") != "Administrador":
+    if session.get("rol") not in ROLES_GESTION_USUARIOS:
         flash("No tienes permiso para eliminar usuarios.", "error")
         return redirect(url_for("administrativo.dashboard"))
 

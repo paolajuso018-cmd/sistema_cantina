@@ -250,12 +250,11 @@ body {
 
 
 /* ==========================================
-   9. MESAS SELECCIONABLES
+   9. MESAS Y LUGARES SELECCIONABLES
 ========================================== */
 
 .zona-mesa {
     position: absolute;
-
     transform: translate(-50%, -50%);
 
     background: transparent;
@@ -264,29 +263,25 @@ body {
 
     cursor: pointer;
     z-index: 2;
-
     transition: 0.2s;
 }
 
+/* Efecto al pasar el cursor */
 .zona-mesa:hover {
     background: #65A34B40;
     border-color: #65A34B;
 }
 
-
-/* MESA 1: REDONDA, 2 PERSONAS */
-
-.zona-mesa[data-mesa="M1"] {
+/* MESA 1: 2 PERSONAS */
+.zona-mesa[data-id="1"] {
     left: 39.5%;
     top: 38.5%;
     width: 15%;
     height: 21%;
 }
 
-
-/* MESA 2: CUADRADA, 4 PERSONAS */
-
-.zona-mesa[data-mesa="M2"] {
+/* MESA 2: 4 PERSONAS */
+.zona-mesa[data-id="2"] {
     left: 67.5%;
     top: 38%;
     width: 17%;
@@ -294,10 +289,8 @@ body {
     border-radius: 15%;
 }
 
-
-/* MESA 3: RECTANGULAR, 6 PERSONAS */
-
-.zona-mesa[data-mesa="M3"] {
+/* MESA 3: 6 PERSONAS */
+.zona-mesa[data-id="3"] {
     left: 33%;
     top: 63%;
     width: 24%;
@@ -305,23 +298,70 @@ body {
     border-radius: 15%;
 }
 
-
-/* MESA 4: REDONDA, 8 PERSONAS */
-
-.zona-mesa[data-mesa="M4"] {
+/* MESA 4: 8 PERSONAS */
+.zona-mesa[data-id="4"] {
     left: 64.5%;
     top: 63.5%;
     width: 24%;
     height: 27%;
 }
 
+/* LUGARES DE BARRA */
 
-/* MESA SELECCIONADA */
+/* ==========================================
+   LUGARES DE BARRA: 1 PERSONA CADA UNO
+========================================== */
 
+/* BARRA 1: PRIMER BANCO */
+.zona-mesa[data-id="5"] {
+    left: 39.7%;
+    top: 22.3%;
+    width: 6.5%;
+    height: 9%;
+    border-radius: 50%;
+}
+
+/* BARRA 2: SEGUNDO BANCO */
+.zona-mesa[data-id="6"] {
+    left: 48%;
+    top: 22.3%;
+    width: 6.5%;
+    height: 9%;
+    border-radius: 50%;
+}
+
+/* BARRA 3: TERCER BANCO */
+.zona-mesa[data-id="7"] {
+    left: 56.4%;
+    top: 22.3%;
+    width: 6.5%;
+    height: 9%;
+    border-radius: 50%;
+}
+
+/* BARRA 4: CUARTO BANCO */
+.zona-mesa[data-id="8"] {
+    left: 64.7%;
+    top: 22.3%;
+    width: 6.5%;
+    height: 9%;
+    border-radius: 50%;
+}
+
+/* BARRA 5: QUINTO BANCO */
+.zona-mesa[data-id="9"] {
+    left: 73.4%;
+    top: 22.3%;
+    width: 6.5%;
+    height: 9%;
+    border-radius: 50%;
+}
+
+
+/* MESA O LUGAR SELECCIONADO */
 .zona-mesa.seleccionada {
     background: #D7A32D55;
     border: 4px solid #D7A32D;
-
     box-shadow: 0 0 15px #D7A32D;
 }
 

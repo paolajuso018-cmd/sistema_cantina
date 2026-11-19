@@ -52,49 +52,84 @@
 
                 <p class="menu-titulo">MENÚ PRINCIPAL</p>
 
+                                
                 <nav class="menu-admin">
 
-                   
-                {% for elemento in menu %}
+                    {% for elemento in menu %}
 
-                    {% set endpoint_actual = request.endpoint %}
+                        {% set endpoint_actual = request.endpoint %}
+                        {% set ruta_actual = request.path %}
 
-                    <a href="{% if elemento.nombre == 'Inicio' %}
-                                    {{ url_for('administrativo.dashboard') }}
-                                {% elif elemento.nombre == 'Usuarios' %}
-                                    {{ url_for('usuarios.gestionar_usuarios') }}
-                                {% elif elemento.nombre == 'Almacén' %}
-                                    {{ url_for('almacen.inventario') }}
-                                {% else %}
-                                    {{ elemento.url }}
-                                {% endif %}"
-                    class="menu-enlace
-                    {% if elemento.nombre == 'Inicio' and endpoint_actual == 'administrativo.dashboard' %}
-                        activo
-                    {% elif elemento.nombre == 'Usuarios' and endpoint_actual == 'usuarios.gestionar_usuarios' %}
-                        activo
-                    {% elif elemento.nombre == 'Almacén' and endpoint_actual.startswith('almacen.') %}
-                        activo
-                    {% elif elemento.nombre == 'Recetas' and request.endpoint == 'recetas.gestionar_recetas' %}
-                        activo
-                    {% elif elemento.nombre == 'Reservaciones' and request.endpoint == 'administrativo.reservaciones_administrador' %}
-                        activo
-                    {% endif %}"
-                    
-                    >
+                        <a href="
+                            {% if elemento.nombre == 'Inicio' %}
+                                {{ url_for('administrativo.dashboard') }}
 
-                        <span class="menu-icono">
-                            <i class="bi {{ elemento.icono }}"></i>
-                        </span>
+                            {% elif elemento.nombre == 'Usuarios' or elemento.nombre == 'Personal' %}
+                                {{ url_for('usuarios.gestionar_usuarios') }}
 
-                        <span>{{ elemento.nombre }}</span>
+                            {% elif elemento.nombre == 'Almacén' %}
+                                {{ url_for('almacen.inventario') }}
 
-                    </a>
+                            {% elif elemento.nombre == 'Compras' and rol == 'Gerente' %}
+                                {{ url_for('compras_gerente.compras') }}
 
-                {% endfor %}
+                            {% elif elemento.nombre == 'Ventas' and rol == 'Administrador' %}
+                                {{ url_for('administrativo.ventas_administrador') }}
 
+                            {% elif elemento.nombre == 'Reservaciones' %}
+                                {{ url_for('administrativo.reservaciones_administrador') }}
+
+                            {% else %}
+                                {{ elemento.url }}
+                            {% endif %}
+                        "
+
+                        class="menu-enlace
+
+                        {% if elemento.nombre == 'Inicio' and endpoint_actual == 'administrativo.dashboard' %}
+                            activo
+
+                        {% elif elemento.nombre == 'Usuarios' and endpoint_actual == 'usuarios.gestionar_usuarios' %}
+                            activo
+
+                        {% elif elemento.nombre == 'Personal' and endpoint_actual == 'usuarios.gestionar_usuarios' %}
+                            activo
+
+                        {% elif elemento.nombre == 'Almacén' and endpoint_actual.startswith('almacen.') %}
+                            activo
+
+                        {% elif elemento.nombre == 'Recetas' and endpoint_actual == 'recetas.gestionar_recetas' %}
+                            activo
+
+                        {% elif elemento.nombre == 'Reservaciones' and endpoint_actual == 'administrativo.reservaciones_administrador' %}
+                            activo
+
+                        {% elif elemento.nombre == 'Ventas' and rol == 'Administrador' and ruta_actual.startswith('/admin/ventas') %}
+                            activo
+
+                        {% elif elemento.nombre == 'Proveedores' and rol == 'Administrador' and ruta_actual.startswith('/admin/proveedores') %}
+                            activo
+
+                        {% elif elemento.nombre == 'Compras' and rol == 'Administrador' and ruta_actual.startswith('/admin/reportes/compras') %}
+                            activo
+
+                        {% elif elemento.nombre == 'Compras' and rol == 'Gerente' and ruta_actual.startswith('/gerente/compras') %}
+                            activo
+
+                        {% endif %}">
+
+                            <span class="menu-icono">
+                                <i class="bi {{ elemento.icono }}"></i>
+                            </span>
+
+                            <span>{{ elemento.nombre }}</span>
+
+                        </a>
+
+                    {% endfor %}
 
                 </nav>
+
 
             </div>
 

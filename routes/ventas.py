@@ -1,4 +1,3 @@
-
 from flask import (
     Blueprint,
     render_template,
@@ -114,7 +113,14 @@ def recalcular_totales(cursor, id_venta):
     return total
 
 
-def verificar_cuenta(cursor, id_venta, id_usuario):
+
+def verificar_cuenta(cursor, id_venta):
+    """
+    Verifica que la cuenta exista y continúe abierta.
+
+    No limita la cuenta al usuario que la creó,
+    porque recepción puede abrirla al recibir una reservación.
+    """
 
     cursor.execute("""
         SELECT
@@ -128,13 +134,9 @@ def verificar_cuenta(cursor, id_venta, id_usuario):
             nombre_cliente
         FROM ventas
         WHERE id_venta = %s
-          AND id_usuario = %s
           AND estado = 'Abierta'
         FOR UPDATE
-    """, (
-        id_venta,
-        id_usuario
-    ))
+    """, (id_venta,))
 
     return cursor.fetchone()
 
@@ -240,6 +242,7 @@ def api_productos():
             conexion.close()
 
 
+
 # ==========================================================
 # CONSULTAR MESAS Y CUENTAS ABIERTAS
 # ==========================================================
@@ -254,9 +257,8 @@ def api_cuentas():
         conexion = obtener_conexion_segura()
         cursor = conexion.cursor(dictionary=True)
 
-        id_usuario = session["id_usuario"]
-
-        # CUENTAS ABIERTAS DEL CAJERO
+        # TODAS LAS CUENTAS ABIERTAS
+        # INCLUYE LAS CREADAS POR RECEPCIÓN.
 
         cursor.execute("""
             SELECT
@@ -279,7 +281,6 @@ def api_cuentas():
                 ON d.id_venta = v.id_venta
 
             WHERE v.estado = 'Abierta'
-              AND v.id_usuario = %s
 
             GROUP BY
                 v.id_venta,
@@ -292,37 +293,59 @@ def api_cuentas():
                 m.nombre_mesa
 
             ORDER BY v.fecha_venta DESC
-        """, (id_usuario,))
+        """)
 
         cuentas = cursor.fetchall()
 
-        # MESAS Y DISPONIBILIDAD
+        # CONSULTAR MESAS Y SU DISPONIBILIDAD.
 
+        
         cursor.execute("""
             SELECT
                 m.id_mesa,
                 m.nombre_mesa,
                 m.capacidad,
                 m.tipo,
+                m.estado,
 
                 CASE
                     WHEN EXISTS (
                         SELECT 1
                         FROM ventas v
                         WHERE v.id_mesa = m.id_mesa
-                          AND v.tipo_cuenta = 'Mesa'
-                          AND v.estado = 'Abierta'
+                        AND v.tipo_cuenta = 'Mesa'
+                        AND v.estado = 'Abierta'
                     )
                     THEN 'Ocupada'
+
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM reservaciones r
+                        WHERE r.id_mesa = m.id_mesa
+                        AND r.fecha = CURDATE()
+                        AND r.estado = 'En curso'
+                    )
+                    THEN 'Ocupada'
+
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM reservaciones r
+                        WHERE r.id_mesa = m.id_mesa
+                        AND r.fecha = CURDATE()
+                        AND r.estado IN ('Reservada', 'Confirmada')
+                    )
+                    THEN 'Reservada'
+
                     ELSE 'Disponible'
                 END AS disponibilidad
 
             FROM mesas m
-
+            WHERE m.estado = 'Activa'
             ORDER BY m.id_mesa
         """)
 
         mesas = cursor.fetchall()
+
 
         cursor.close()
 
@@ -491,6 +514,7 @@ def abrir_cuenta():
             conexion.close()
 
 
+
 # ==========================================================
 # CONSULTAR DETALLE DE UNA CUENTA
 # ==========================================================
@@ -523,12 +547,8 @@ def detalle_cuenta(id_venta):
                 ON m.id_mesa = v.id_mesa
 
             WHERE v.id_venta = %s
-              AND v.id_usuario = %s
               AND v.estado = 'Abierta'
-        """, (
-            id_venta,
-            session["id_usuario"]
-        ))
+        """, (id_venta,))
 
         cuenta = cursor.fetchone()
 
@@ -617,8 +637,7 @@ def agregar_producto():
 
         cuenta = verificar_cuenta(
             cursor,
-            id_venta,
-            session["id_usuario"]
+            id_venta
         )
 
         if not cuenta:
@@ -765,8 +784,7 @@ def actualizar_producto():
 
         cuenta = verificar_cuenta(
             cursor,
-            id_venta,
-            session["id_usuario"]
+            id_venta
         )
 
         if not cuenta:
@@ -942,8 +960,7 @@ def cobrar():
 
         cuenta = verificar_cuenta(
             cursor,
-            id_venta,
-            session["id_usuario"]
+            id_venta
         )
 
         if not cuenta:

@@ -1,0 +1,1019 @@
+
+/* =====================================================
+   COMPRAS - LA CANTINA
+   PANEL DEL GERENTE
+===================================================== */
+
+.compras-contenedor {
+    width: 100%;
+    padding: 8px 10px 30px;
+    color: #421C19;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.compras-contenedor * {
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   ENCABEZADO
+===================================================== */
+
+.compras-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.compras-titulo {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.compras-icono-principal {
+    width: 70px;
+    height: 70px;
+    display: grid;
+    place-items: center;
+    color: #780D18;
+    font-size: 53px;
+}
+
+.compras-titulo h1 {
+    margin: 0;
+    color: #780D18;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.compras-titulo p {
+    margin: 5px 0 0;
+    color: #702C25;
+    font-size: 16px;
+}
+
+
+/* =====================================================
+   ESTADÍSTICAS
+===================================================== */
+
+.compras-estadisticas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.tarjeta-compra {
+    min-height: 125px;
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #EACFC1;
+    border-radius: 18px;
+    background: #FFF8F1;
+    box-shadow: 0 3px 10px rgba(100, 35, 25, .04);
+}
+
+.tarjeta-bajo-stock {
+    background: #FCE5E1;
+    border-color: #F3D0CA;
+}
+
+.tarjeta-pedidos {
+    background: #FFF0D9;
+    border-color: #F0DFC2;
+}
+
+.estadistica-icono {
+    width: 75px;
+    height: 75px;
+    min-width: 75px;
+    display: grid;
+    place-items: center;
+    color: #780D18;
+    font-size: 48px;
+}
+
+.estadistica-informacion span {
+    display: block;
+    color: #701019;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.estadistica-informacion strong {
+    display: block;
+    margin-top: 5px;
+    color: #780D18;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+
+/* =====================================================
+   DISTRIBUCIÓN PRINCIPAL
+===================================================== */
+
+.compras-distribucion {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(420px, .88fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.compras-panel {
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #F0D8CE;
+    border-radius: 20px;
+    background: rgba(255, 250, 245, .48);
+}
+
+
+/* =====================================================
+   ENCABEZADOS DE PANELES
+===================================================== */
+
+.panel-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.panel-encabezado h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    color: #780D18;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.panel-encabezado h2 i {
+    font-size: 31px;
+}
+
+.contador-insumos {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #F7E4D5;
+    color: #78101B;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   TABLA DE INSUMOS CON BAJO STOCK
+===================================================== */
+
+.tabla-compras-contenedor {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #F1DDD0;
+    border-radius: 13px;
+    background: #FFF9F3;
+}
+
+.tabla-compras {
+    width: 100%;
+    min-width: 570px;
+    border-collapse: collapse;
+}
+
+.tabla-compras thead {
+    background: linear-gradient(100deg, #8B101C, #690711);
+    color: #FFFFFF;
+}
+
+.tabla-compras th {
+    padding: 13px 9px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.tabla-compras th:first-child {
+    border-radius: 10px 0 0 0;
+}
+
+.tabla-compras th:last-child {
+    border-radius: 0 10px 0 0;
+}
+
+.tabla-compras td {
+    padding: 13px 9px;
+    border-bottom: 1px solid #F1E1D6;
+    text-align: center;
+    font-size: 14px;
+    color: #321C18;
+}
+
+.tabla-compras tbody tr:nth-child(even) {
+    background: #FFF1E5;
+}
+
+.tabla-compras tbody tr:hover {
+    background: #FBE4D5;
+}
+
+.tabla-compras tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.nombre-insumo {
+    text-align: left !important;
+    font-weight: 800;
+}
+
+.stock-bajo {
+    color: #A51B20;
+    font-weight: 800;
+}
+
+.stock-sin-existencia {
+    color: #D71920;
+    font-weight: 900;
+}
+
+
+/* =====================================================
+   TABLA VACÍA
+===================================================== */
+
+.tabla-vacia {
+    padding: 45px 15px !important;
+    text-align: center !important;
+    color: #777 !important;
+}
+
+.tabla-vacia i {
+    display: block;
+    margin-bottom: 10px;
+    color: #55945B;
+    font-size: 35px;
+}
+
+.tabla-vacia p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.tabla-vacia span {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   NOTA DE STOCK
+===================================================== */
+
+.nota-stock {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 11px;
+    background: #FFF0DF;
+    color: #71452E;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.nota-stock i {
+    margin-top: 2px;
+    color: #9C541B;
+    font-size: 16px;
+}
+
+
+/* =====================================================
+   FORMULARIO REALIZAR PEDIDO
+===================================================== */
+
+.panel-realizar-pedido {
+    padding: 18px 20px 20px;
+}
+
+.panel-realizar-pedido .panel-encabezado {
+    margin-bottom: 18px;
+}
+
+.panel-realizar-pedido .panel-encabezado h2 {
+    font-size: 27px;
+}
+
+.formulario-pedido {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.campo-pedido {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.campo-pedido label {
+    color: #76101A;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.campo-pedido label span,
+.pedido-insumos-encabezado h3 span {
+    color: #A40D18;
+}
+
+.campo-pedido input,
+.campo-pedido select,
+.campo-pedido textarea {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid #E5C9C4;
+    border-radius: 11px;
+    outline: none;
+    background: rgba(255, 255, 255, .65);
+    color: #321C18;
+    font-family: inherit;
+    font-size: 15px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.campo-pedido input,
+.campo-pedido select {
+    height: 45px;
+    padding: 0 14px;
+}
+
+.campo-pedido textarea {
+    min-height: 82px;
+    padding: 12px 14px;
+    resize: vertical;
+}
+
+.campo-pedido input:focus,
+.campo-pedido select:focus,
+.campo-pedido textarea:focus {
+    border-color: #8B101C;
+    box-shadow: 0 0 0 3px rgba(139, 16, 28, .09);
+}
+
+.campo-pedido input::placeholder,
+.campo-pedido textarea::placeholder {
+    color: #9B8C87;
+}
+
+
+/* =====================================================
+   CAMPO CON ICONO
+===================================================== */
+
+.campo-con-icono {
+    position: relative;
+}
+
+.campo-con-icono i {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #850E19;
+    font-size: 21px;
+    pointer-events: none;
+}
+
+.campo-con-icono input {
+    padding-left: 47px;
+}
+
+
+/* =====================================================
+   ENCABEZADO DE INSUMOS DEL PEDIDO
+===================================================== */
+
+.pedido-insumos-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 0;
+}
+
+.pedido-insumos-encabezado h3 {
+    margin: 0;
+    color: #78101B;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.btn-agregar-insumo {
+    min-height: 41px;
+    padding: 0 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #850D19;
+    border-radius: 10px;
+    background: linear-gradient(110deg, #920D1B, #6E0712);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.btn-agregar-insumo:hover {
+    background: #5F0710;
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   TABLA DEL PEDIDO
+===================================================== */
+
+.tabla-pedido-contenedor {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #F0DCD3;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .25);
+}
+
+.tabla-pedido {
+    width: 100%;
+    min-width: 420px;
+    border-collapse: collapse;
+}
+
+.tabla-pedido thead {
+    background: linear-gradient(100deg, #8C101C, #690711);
+    color: white;
+}
+
+.tabla-pedido th {
+    padding: 10px 7px;
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tabla-pedido td {
+    padding: 11px 7px;
+    border-bottom: 1px solid #F0E0D7;
+    text-align: center;
+    font-size: 13px;
+}
+
+.tabla-pedido tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.pedido-sin-insumos {
+    height: 120px;
+    color: #777 !important;
+    text-align: center !important;
+}
+
+.pedido-sin-insumos i {
+    display: block;
+    margin-bottom: 8px;
+    color: #999;
+    font-size: 39px;
+}
+
+.pedido-sin-insumos p {
+    margin: 0;
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   FILAS AGREGADAS AL PEDIDO
+===================================================== */
+
+.fila-insumo-pedido td {
+    vertical-align: middle;
+}
+
+.nombre-insumo-pedido {
+    color: #4A251F;
+    font-weight: 700;
+    text-align: left !important;
+}
+
+.cantidad-insumo-pedido {
+    width: 90px;
+    height: 35px;
+    padding: 5px;
+    border: 1px solid #DCC1B8;
+    border-radius: 7px;
+    text-align: center;
+    outline: none;
+    font-family: inherit;
+}
+
+.cantidad-insumo-pedido:focus {
+    border-color: #850D19;
+}
+
+.btn-quitar-insumo {
+    width: 33px;
+    height: 33px;
+    border: none;
+    border-radius: 8px;
+    background: #F9D9D5;
+    color: #A3161D;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.btn-quitar-insumo:hover {
+    background: #D71920;
+    color: white;
+}
+
+
+/* =====================================================
+   TOTAL ESTIMADO
+===================================================== */
+
+.pedido-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 15px;
+    border: 1px solid #EED7BF;
+    border-radius: 11px;
+    background: #FFF0DF;
+}
+
+.pedido-total span {
+    color: #6F332A;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.pedido-total strong {
+    color: #780D18;
+    font-size: 21px;
+    font-weight: 900;
+}
+
+
+/* =====================================================
+   OBSERVACIONES
+===================================================== */
+
+.campo-observaciones {
+    margin-top: 0;
+}
+
+
+/* =====================================================
+   MENSAJES
+===================================================== */
+
+.mensaje-campo {
+    color: #B02020;
+    font-size: 12px;
+}
+
+.mensaje-compras {
+    display: none;
+    padding: 11px 13px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.mensaje-compras.visible {
+    display: block;
+}
+
+.mensaje-compras.error {
+    background: #FBE0DC;
+    color: #A41B1B;
+    border: 1px solid #E9B5AD;
+}
+
+.mensaje-compras.success {
+    background: #E3F1DF;
+    color: #27652F;
+    border: 1px solid #B9D7B0;
+}
+
+
+/* =====================================================
+   BOTONES DEL PEDIDO
+===================================================== */
+
+.acciones-pedido {
+    display: grid;
+    grid-template-columns: .85fr 1.25fr;
+    gap: 13px;
+    margin-top: 2px;
+}
+
+.acciones-pedido button {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.btn-cancelar-pedido {
+    border: 1px solid #8B101C;
+    background: transparent;
+    color: #81101A;
+}
+
+.btn-cancelar-pedido:hover {
+    background: #F8E1D8;
+}
+
+.btn-generar-pedido {
+    border: 1px solid #850D19;
+    background: linear-gradient(110deg, #920D1B, #690711);
+    color: #FFFFFF;
+}
+
+.btn-generar-pedido:hover {
+    background: #57050D;
+    transform: translateY(-1px);
+}
+
+.btn-generar-pedido:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =====================================================
+   MODAL AGREGAR INSUMO
+===================================================== */
+
+.modal-compras-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(35, 9, 9, .58);
+    backdrop-filter: blur(3px);
+}
+
+.modal-compras-overlay.visible {
+    display: flex;
+}
+
+.modal-compras {
+    width: 100%;
+    max-width: 530px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid #D9AD83;
+    border-radius: 19px;
+    background: #FFF8F0;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, .25);
+    animation: modalAparecer .22s ease;
+}
+
+@keyframes modalAparecer {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-compras-encabezado {
+    min-height: 65px;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 3px solid #D9A45C;
+    background: linear-gradient(110deg, #8A101B, #650713);
+    color: white;
+}
+
+.modal-compras-encabezado h2 {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin: 0;
+    font-size: 23px;
+}
+
+.cerrar-modal-compras {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.cerrar-modal-compras:hover {
+    background: rgba(255, 255, 255, .15);
+}
+
+.modal-compras-cuerpo {
+    padding: 23px;
+}
+
+.modal-descripcion {
+    margin: 0 0 20px;
+    color: #755148;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   INFORMACIÓN DEL INSUMO
+===================================================== */
+
+.informacion-insumo {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 17px;
+    padding: 14px 10px;
+    border: 1px solid #EAD2B8;
+    border-radius: 12px;
+    background: #FFF0DF;
+}
+
+.informacion-insumo[hidden] {
+    display: none !important;
+}
+
+.informacion-insumo div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+}
+
+.informacion-insumo span {
+    color: #76554A;
+    font-size: 12px;
+}
+
+.informacion-insumo strong {
+    color: #780D18;
+    font-size: 15px;
+}
+
+
+/* =====================================================
+   BOTONES DEL MODAL
+===================================================== */
+
+.botones-modal-compras {
+    display: flex;
+    gap: 12px;
+    margin-top: 23px;
+}
+
+.botones-modal-compras button {
+    flex: 1;
+    min-height: 45px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-modal-cancelar {
+    border: 1px solid #8B101C;
+    background: transparent;
+    color: #81101A;
+}
+
+.btn-modal-cancelar:hover {
+    background: #F7E2D7;
+}
+
+.btn-modal-agregar {
+    border: 1px solid #850D19;
+    background: #850D19;
+    color: white;
+}
+
+.btn-modal-agregar:hover {
+    background: #620812;
+}
+
+
+/* =====================================================
+   NOTIFICACIONES
+===================================================== */
+
+.notificacion-compras {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 11000;
+    width: max-content;
+    max-width: min(390px, calc(100vw - 35px));
+    padding: 15px 20px;
+    border-radius: 11px;
+    background: #E3F1DF;
+    color: #27652F;
+    border-left: 5px solid #368343;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, .18);
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(20px);
+    transition: .25s ease;
+}
+
+.notificacion-compras.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.notificacion-compras.error {
+    background: #FBE0DC;
+    color: #A41B1B;
+    border-left-color: #D71920;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1200px) {
+
+    .compras-distribucion {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .panel-realizar-pedido {
+        max-width: 100%;
+    }
+
+}
+
+@media (max-width: 760px) {
+
+    .compras-contenedor {
+        padding: 5px 3px 20px;
+    }
+
+    .compras-titulo {
+        gap: 10px;
+    }
+
+    .compras-icono-principal {
+        width: 48px;
+        height: 48px;
+        font-size: 37px;
+    }
+
+    .compras-titulo h1 {
+        font-size: 25px;
+    }
+
+    .compras-titulo p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .compras-estadisticas {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .tarjeta-compra {
+        min-height: 100px;
+        padding: 15px;
+    }
+
+    .estadistica-icono {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        font-size: 38px;
+    }
+
+    .estadistica-informacion span {
+        font-size: 15px;
+    }
+
+    .estadistica-informacion strong {
+        font-size: 31px;
+    }
+
+    .compras-panel {
+        padding: 13px;
+    }
+
+    .panel-encabezado h2 {
+        font-size: 20px;
+    }
+
+    .panel-encabezado h2 i {
+        font-size: 24px;
+    }
+
+    .pedido-insumos-encabezado {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .btn-agregar-insumo {
+        width: 100%;
+    }
+
+    .acciones-pedido {
+        grid-template-columns: 1fr;
+    }
+
+    .acciones-pedido button {
+        min-height: 47px;
+    }
+
+    .informacion-insumo {
+        grid-template-columns: 1fr;
+        gap: 13px;
+    }
+
+    .informacion-insumo div {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+}
+
+@media (max-width: 430px) {
+
+    .panel-encabezado {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .contador-insumos {
+        align-self: flex-start;
+    }
+
+    .modal-compras-cuerpo {
+        padding: 17px;
+    }
+
+    .botones-modal-compras {
+        flex-direction: column;
+    }
+
+}
