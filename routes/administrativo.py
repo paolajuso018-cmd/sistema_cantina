@@ -713,7 +713,7 @@ def reservaciones_administrador():
 
     rol = str(session.get("rol", "")).strip().lower()
 
-    if rol not in ["administrador", "gerente"]:
+    if rol not in ["administrador", "gerente","recepcionista"]:
         flash("No tienes permiso para acceder.", "error")
         return redirect(url_for("login.login"))
 
@@ -729,7 +729,7 @@ def reservaciones_administrador():
 # API: CONSULTAR RESERVACIONES
 # ==========================================
 
-@administrativo_bp.route("/admin/api/reservaciones")
+@administrativo_bp.route("/admin/api/rzeservaciones")
 def api_reservaciones_administrador():
 
     if "id_usuario" not in session:
@@ -737,7 +737,7 @@ def api_reservaciones_administrador():
 
     rol = str(session.get("rol", "")).strip().lower()
 
-    if rol not in ["administrador", "gerente"]:
+    if rol not in ["administrador", "gerente", "recepcionista"]:
         return jsonify({"ok": False, "mensaje": "Sin autorización."}), 403
 
     conexion = None
@@ -913,7 +913,7 @@ def cambiar_estado_reservacion_admin(id_reservacion):
 
     rol = str(session.get("rol", "")).strip().lower()
 
-    if rol not in ["administrador", "gerente"]:
+    if rol not in ["administrador", "gerente","recepcionista"]:
         return jsonify({"ok": False, "mensaje": "Sin autorización."}), 403
 
     datos = request.get_json(silent=True) or {}
@@ -996,7 +996,7 @@ def crear_reservacion_admin():
 
     rol = str(session.get("rol", "")).strip().lower()
 
-    if rol not in ["administrador", "gerente"]:
+    if rol not in ["administrador", "gerente","recepcionista"]:
         return jsonify({"ok": False, "mensaje": "Sin autorización."}), 403
 
     datos = request.get_json(silent=True) or {}

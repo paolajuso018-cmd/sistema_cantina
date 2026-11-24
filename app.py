@@ -5,6 +5,8 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
+if not app.config.get("SECRET_KEY"):
+    raise RuntimeError("Falta configurar SECRET_KEY")
 
 # ==========================================
 # BLUEPRINTS
@@ -57,12 +59,14 @@ def inicio():
 @app.route("/prueba-conexion")
 def prueba_conexion():
 
+    if not app.debug:
+        return "No disponible", 404
+
     from models.conexion import obtener_conexion
 
     conexion = obtener_conexion()
 
     if conexion:
-
         cursor = conexion.cursor()
         cursor.execute("SELECT DATABASE()")
         resultado = cursor.fetchone()
@@ -70,19 +74,9 @@ def prueba_conexion():
         cursor.close()
         conexion.close()
 
-        return f"""
-            <h1>¡Conexión exitosa!</h1>
-            <p>Base de datos conectada: {resultado[0]}</p>
-        """
+        return "Conexión exitosa"
 
-    return "Error: No se pudo conectar con MySQL."
-
-print("\n========== RUTAS REGISTRADAS ==========")
-
-for regla in app.url_map.iter_rules():
-    print(regla.endpoint, "->", regla.rule)
-
-print("=======================================\n")
+    return "Error de conexión", 500
 
 # ==========================================
 # EJECUTAR APLICACIÓN
