@@ -654,6 +654,14 @@
 
             else if (tipo === "destilados") {
 
+                return(
+                    nombre.includes("destilado") ||
+                    nombre.includes("bebida") ||
+                    nombre.includes("tradicional") ||
+                    nombre.includes("tropical") ||
+                    nombre.includes("shot")
+                );
+
                 titulo = "Bebidas y destilados";
 
                 descripcion =
