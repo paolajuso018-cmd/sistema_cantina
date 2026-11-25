@@ -869,10 +869,160 @@ def actualizar_producto():
             conexion.close()
 
 
+def descontar_inventario_venta(cursor, id_venta, id_usuario, folio):
+    """
+    Descuenta los ingredientes de las recetas vendidas
+    y registra sus movimientos de salida.
+
+    Debe ejecutarse dentro de la transacción del cobro.
+    """
+
+    # Obtener ingredientes de todos los productos vendidos
+    cursor.execute("""
+        SELECT
+            dv.id_producto,
+            dv.cantidad AS cantidad_vendida,
+            p.nombre AS producto,
+            dr.id_insumo,
+            dr.cantidad AS cantidad_ingrediente
+        FROM detalle_ventas dv
+        INNER JOIN productos p
+            ON p.id_producto = dv.id_producto
+        INNER JOIN recetas r
+            ON r.id_producto = dv.id_producto
+        INNER JOIN detalle_recetas dr
+            ON dr.id_receta = r.id_receta
+        WHERE dv.id_venta = %s
+        ORDER BY dr.id_insumo
+    """, (id_venta,))
+
+    ingredientes = cursor.fetchall()
+
+    if not ingredientes:
+        # Los productos sin receta no generan descuento
+        return
+
+    # Acumular cantidades por insumo
+    descuentos = {}
+
+    for ingrediente in ingredientes:
+
+        id_insumo = ingrediente["id_insumo"]
+
+        cantidad_vendida = Decimal(
+            str(ingrediente["cantidad_vendida"])
+        )
+
+        cantidad_receta = Decimal(
+            str(ingrediente["cantidad_ingrediente"])
+        )
+
+        cantidad_total = cantidad_vendida * cantidad_receta
+
+        if cantidad_total <= 0:
+            raise ValueError(
+                "Se encontró una cantidad de ingrediente inválida."
+            )
+
+        if id_insumo not in descuentos:
+            descuentos[id_insumo] = Decimal("0.000")
+
+        descuentos[id_insumo] += cantidad_total
+
+    # Bloquear los insumos para evitar descuentos simultáneos
+    ids_insumos = sorted(descuentos.keys())
+
+    placeholders = ",".join(["%s"] * len(ids_insumos))
+
+    cursor.execute(f"""
+        SELECT
+            id_insumo,
+            nombre,
+            stock_actual,
+            estado
+        FROM insumos
+        WHERE id_insumo IN ({placeholders})
+        ORDER BY id_insumo
+        FOR UPDATE
+    """, tuple(ids_insumos))
+
+    existencias = cursor.fetchall()
+
+    insumos_encontrados = {
+        item["id_insumo"]: item
+        for item in existencias
+    }
+
+    # Verificar que todos los ingredientes existan
+    for id_insumo in ids_insumos:
+
+        insumo = insumos_encontrados.get(id_insumo)
+
+        if not insumo:
+            raise ValueError(
+                f"No se encontró el insumo con ID {id_insumo}."
+            )
+
+        if insumo["estado"] != "Activo":
+            raise ValueError(
+                f"El insumo {insumo['nombre']} está inactivo."
+            )
+
+        stock = Decimal(str(insumo["stock_actual"]))
+        necesario = descuentos[id_insumo]
+
+        if stock < necesario:
+            raise ValueError(
+                f"Inventario insuficiente de {insumo['nombre']}. "
+                f"Existencia: {stock:.3f}. "
+                f"Necesario: {necesario:.3f}."
+            )
+
+    # Descontar existencias y registrar movimientos
+    for id_insumo in ids_insumos:
+
+        insumo = insumos_encontrados[id_insumo]
+        cantidad = descuentos[id_insumo]
+
+        cursor.execute("""
+            UPDATE insumos
+            SET stock_actual = stock_actual - %s
+            WHERE id_insumo = %s
+              AND stock_actual >= %s
+        """, (
+            cantidad,
+            id_insumo,
+            cantidad
+        ))
+
+        if cursor.rowcount != 1:
+            raise ValueError(
+                f"No se pudo actualizar el inventario de "
+                f"{insumo['nombre']}."
+            )
+
+        cursor.execute("""
+            INSERT INTO movimientos_inventario (
+                id_insumo,
+                id_usuario,
+                tipo_movimiento,
+                cantidad,
+                motivo
+            )
+            VALUES (%s, %s, 'Salida', %s, %s)
+        """, (
+            id_insumo,
+            id_usuario,
+            cantidad,
+            f"Consumo por venta - Folio {folio}"
+        ))
+
+
 # ==========================================================
 # COBRAR CUENTA
 # ADMITE PAGOS SENCILLOS Y MIXTOS
 # ==========================================================
+
 
 @ventas_bp.route("/api/cobrar", methods=["POST"])
 @requiere_cajero
@@ -958,6 +1108,7 @@ def cobrar():
         conexion = obtener_conexion_segura()
         cursor = conexion.cursor(dictionary=True)
 
+        # Verificar y bloquear la cuenta
         cuenta = verificar_cuenta(
             cursor,
             id_venta
@@ -987,6 +1138,21 @@ def cobrar():
                 f"Los pagos deben sumar exactamente ${total:.2f}."
             )
 
+        # ======================================
+        # DESCONTAR INVENTARIO Y REGISTRAR SALIDAS
+        # ======================================
+
+        descontar_inventario_venta(
+            cursor,
+            id_venta,
+            session["id_usuario"],
+            cuenta["folio"]
+        )
+
+        # ======================================
+        # REGISTRAR MÉTODOS DE PAGO
+        # ======================================
+
         metodo_resumen = (
             pagos_limpios[0]["metodo"]
             if len(pagos_limpios) == 1
@@ -994,8 +1160,6 @@ def cobrar():
         )
 
         cambio_total = total_recibido - total_pagado
-
-        # REGISTRAR CADA MÉTODO DE PAGO
 
         for pago in pagos_limpios:
 
@@ -1025,7 +1189,9 @@ def cobrar():
                 cambio
             ))
 
-        # CERRAR VENTA
+        # ======================================
+        # COMPLETAR VENTA
+        # ======================================
 
         cursor.execute("""
             UPDATE ventas
@@ -1038,16 +1204,29 @@ def cobrar():
             id_venta
         ))
 
+        if cursor.rowcount != 1:
+            raise ValueError(
+                "No se pudo completar la venta."
+            )
+
+        # Confirmar todos los cambios juntos
         conexion.commit()
         cursor.close()
 
         return jsonify({
             "ok": True,
-            "mensaje": "Venta cobrada correctamente.",
+            "mensaje": "Venta cobrada e inventario actualizado correctamente.",
             "id_venta": id_venta,
             "total": float(total),
             "cambio": float(cambio_total)
         })
+
+    except ValueError as error:
+
+        if conexion:
+            conexion.rollback()
+
+        return respuesta_error(str(error))
 
     except Exception as error:
 
