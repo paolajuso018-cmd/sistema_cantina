@@ -48,10 +48,7 @@ MENUS_ROLES = {
 
     "Cajero": [
         {"nombre": "Inicio", "icono": "bi-house-door", "url": "#"},
-        {"nombre": "Caja", "icono": "bi-safe", "url": "#"},
-        {"nombre": "Ventas", "icono": "bi-receipt", "url": "/ventas/"},
-        {"nombre": "Cuentas abiertas", "icono": "bi-journal-text", "url": "#"},
-        {"nombre": "Corte de caja", "icono": "bi-calculator", "url": "#"}
+        {"nombre": "Ventas", "icono": "bi-receipt", "url": "/ventas/"}
     ],
 
     "Mesero": [
@@ -64,16 +61,12 @@ MENUS_ROLES = {
 
     "Bartender": [
         {"nombre": "Inicio", "icono": "bi-house-door", "url": "#"},
-        {"nombre": "Pedidos de barra", "icono": "bi-cup-straw", "url": "#"},
-        {"nombre": "En preparación", "icono": "bi-hourglass-split", "url": "#"},
-        {"nombre": "Pedidos listos", "icono": "bi-check-circle", "url": "#"},
         {"nombre": "Recetas", "icono": "bi-journal-text", "url": "/recetas/"}
     ],
 
     "Recepcionista": [
         {"nombre": "Inicio", "icono": "bi-house-door", "url": "#"},
-        {"nombre": "Reservaciones", "icono": "bi-calendar-check", "url": "/admin/reservaciones"},
-        {"nombre": "Plano de mesas", "icono": "bi-grid-3x3", "url": "#"},
+        {"nombre": "Reservaciones", "icono": "bi-calendar-check", "url": "/admin/reservaciones"}
     ]
 
 }
