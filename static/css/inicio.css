@@ -1251,3 +1251,53 @@ button, input, select {
         height: 330px;
     }
 }
+
+/* ==========================================
+   MENÚ DINÁMICO DE RECETAS
+========================================== */
+
+.receta-publica {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.receta-publica img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+}
+
+.receta-publica .tarjeta-titulo {
+    padding: 18px;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.receta-publica .tarjeta-titulo h3 {
+    margin: 0;
+}
+
+.receta-publica .tarjeta-titulo p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.precio-receta {
+    color: #8b1020;
+    font-size: 1.35rem;
+    font-weight: bold;
+    margin-top: auto;
+}
+
+.menu-vacio {
+    text-align: center;
+    width: 100%;
+    padding: 30px;
+    color: #6b2929;
+}

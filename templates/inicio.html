@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -42,21 +43,18 @@
                 </a>
 
                 <div class="submenu">
-                    <a href="#cocteles">Cócteles</a>
-                    <a href="#cervezas">Cervezas</a>
-                    <a href="#destilados">Bebidas y destilados</a>
+                    <a href="#menu">Todas las bebidas</a>
                 </div>
 
             </div>
 
-            <!-- ACCESO A LA PÁGINA DE RESERVACIONES -->
+            <!-- ACCESO A RESERVACIONES -->
             <a href="{{ url_for('reservaciones.index') }}">
                 Reservaciones
             </a>
 
             <a href="#nosotros">Quiénes somos</a>
             <a href="#ubicacion">Ubicación</a>
-
 
         </nav>
 
@@ -87,7 +85,6 @@
                             Ver menú
                         </a>
 
-                        <!-- BOTÓN CONECTADO A RESERVACIONES -->
                         <a href="{{ url_for('reservaciones.index') }}"
                            class="boton boton-dorado">
                             Reservar mesa
@@ -202,7 +199,7 @@
 
 
         <!-- =====================================
-             MENÚ DE BEBIDAS
+             MENÚ DINÁMICO DE RECETAS
         ====================================== -->
 
         <section class="menu-seccion seccion-textura" id="menu">
@@ -224,64 +221,60 @@
 
             <div class="menu-tarjetas">
 
-                <article class="tarjeta-menu" id="cocteles">
+                {% for receta in recetas_menu %}
 
-                    <img
-                        src="{{ url_for('static', filename='img/cocteles.png') }}"
-                        alt="Cócteles"
-                    >
+                    <article class="tarjeta-menu receta-publica">
 
-                    <div class="tarjeta-titulo">
-                        <h3>Cócteles</h3>
-                    </div>
+                        {% if receta.imagen %}
 
-                </article>
+                            <img
+                                src="{{ url_for('static', filename=receta.imagen) }}"
+                                alt="{{ receta.nombre }}"
+                                loading="lazy"
+                            >
 
+                        {% else %}
 
-                <article class="tarjeta-menu" id="cervezas">
+                            <img
+                                src="{{ url_for('static', filename='img/icono_bebida.png') }}"
+                                alt="Imagen no disponible"
+                                loading="lazy"
+                            >
 
-                    <img
-                        src="{{ url_for('static', filename='img/cervezas.png') }}"
-                        alt="Cervezas"
-                    >
-
-                    <div class="tarjeta-titulo">
-                        <h3>Cervezas</h3>
-                    </div>
-
-                </article>
+                        {% endif %}
 
 
-                <article class="tarjeta-menu" id="destilados">
+                        <div class="tarjeta-titulo">
 
-                    <img
-                        src="{{ url_for('static', filename='img/destilados.png') }}"
-                        alt="Bebidas y destilados"
-                    >
+                            <h3>{{ receta.nombre }}</h3>
 
-                    <div class="tarjeta-titulo">
-                        <h3>Bebidas y destilados</h3>
-                    </div>
+                            <p>
+                                {{ receta.descripcion or 'Disfruta de esta especialidad de La Cantina.' }}
+                            </p>
 
-                </article>
+                            <span class="precio-receta">
+                                ${{ "%.2f"|format(receta.precio_venta) }}
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                {% else %}
+
+                    <p class="menu-vacio">
+                        Próximamente tendremos nuestras especialidades disponibles.
+                    </p>
+
+                {% endfor %}
 
             </div>
-
-
-            <a href="#"
-               class="boton-menu-completo">
-
-                Consultar menú completo
-                <i class="bi bi-arrow-right"></i>
-
-            </a>
 
         </section>
 
 
         <!-- =====================================
              GALERÍA DEL ESTABLECIMIENTO
-             SIN FORMULARIO DE RESERVACIÓN
         ====================================== -->
 
         <section class="reservaciones-galeria seccion-textura"
@@ -423,6 +416,7 @@
     </footer>
 
 
+    <!-- JAVASCRIPT ORIGINAL DE LA PÁGINA -->
     <script src="{{ url_for('static', filename='js/inicio.js') }}"></script>
 
 </body>
