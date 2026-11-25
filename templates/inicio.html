@@ -38,7 +38,7 @@
 
             <div class="menu-desplegable">
                 <a href="#menu" class="enlace-menu">
-                    Menú <i class="bi bi-chevron-down"></i>
+                    Menú
                 </a>
             </div>
 
@@ -540,46 +540,41 @@
         const productosMenu = document.querySelectorAll(".producto-publico");
 
 
-        // Normalizar categorías para comparar nombres.
+        
         function normalizarCategoria(texto) {
-
-            return texto
-                .toLowerCase()
+            return (texto || "")
+                .toString()
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "")
-                .trim();
-
+                .trim()
+                .toLowerCase();
         }
 
-
-        // Identificar la categoría de cada producto.
         function perteneceCategoria(categoria, tipo) {
 
             const nombre = normalizarCategoria(categoria);
 
             if (tipo === "cocteles") {
-                return nombre.includes("coctel");
+                return nombre === "cocteles" || nombre === "coctel";
             }
 
             if (tipo === "cervezas") {
-                return nombre.includes("cerveza");
+                return nombre === "cervezas" || nombre === "cerveza";
             }
 
             if (tipo === "destilados") {
+                const categoriasDestilados = [
+                    "tradicionales",
+                    "tropicales",
+                    "shots"
+                ];
 
-                return (
-                    nombre.includes("destilado") ||
-                    nombre.includes("bebida") ||
-                    nombre.includes("tradicional") ||
-                    nombre.includes("tropical") ||
-                    nombre.includes("shot")
-                );
-
+                return categoriasDestilados.includes(nombre);
             }
 
             return false;
-
         }
+
 
 
         // Abrir una categoría específica.
