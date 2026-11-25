@@ -17,9 +17,7 @@
 
 <body>
 
-    <!-- =====================================
-         ENCABEZADO Y NAVEGACIÓN
-    ====================================== -->
+    <!-- ENCABEZADO Y NAVEGACIÓN -->
 
     <header class="encabezado" id="inicio">
 
@@ -39,11 +37,9 @@
             <a href="#inicio" class="activo">Inicio</a>
 
             <div class="menu-desplegable">
-
                 <a href="#menu" class="enlace-menu">
                     Menú <i class="bi bi-chevron-down"></i>
                 </a>
-
             </div>
 
             <a href="{{ url_for('reservaciones.index') }}">
@@ -60,9 +56,7 @@
 
     <main>
 
-        <!-- =====================================
-             PORTADA PRINCIPAL
-        ====================================== -->
+        <!-- PORTADA PRINCIPAL -->
 
         <section class="portada">
 
@@ -96,9 +90,7 @@
         </section>
 
 
-        <!-- =====================================
-             QUIÉNES SOMOS
-        ====================================== -->
+        <!-- QUIÉNES SOMOS -->
 
         <section class="nosotros seccion-textura" id="nosotros">
 
@@ -142,9 +134,7 @@
         </section>
 
 
-        <!-- =====================================
-             CARACTERÍSTICAS
-        ====================================== -->
+        <!-- CARACTERÍSTICAS -->
 
         <section class="caracteristicas">
 
@@ -157,11 +147,9 @@
                 >
 
                 <h3>Bebidas selectas</h3>
-
                 <p>Cócteles, destilados y más</p>
 
             </div>
-
 
             <div class="caracteristica">
 
@@ -172,11 +160,9 @@
                 >
 
                 <h3>Ambiente único</h3>
-
                 <p>Ideal para amigos y familia</p>
 
             </div>
-
 
             <div class="caracteristica">
 
@@ -187,7 +173,6 @@
                 >
 
                 <h3>Servicio de calidad</h3>
-
                 <p>Hospitalidad que nos distingue</p>
 
             </div>
@@ -195,9 +180,7 @@
         </section>
 
 
-        <!-- =====================================
-             MENÚ PRINCIPAL POR CATEGORÍAS
-        ====================================== -->
+        <!-- MENÚ PRINCIPAL POR CATEGORÍAS -->
 
         <section class="menu-seccion seccion-textura" id="menu">
 
@@ -218,7 +201,7 @@
 
             <div class="menu-tarjetas">
 
-                <!-- CATEGORÍA CÓCTELES -->
+                <!-- CÓCTELES -->
 
                 <article
                     class="tarjeta-menu categoria-publica"
@@ -235,15 +218,13 @@
                     >
 
                     <div class="tarjeta-titulo">
-
                         <h3>Cócteles</h3>
-
                     </div>
 
                 </article>
 
 
-                <!-- CATEGORÍA CERVEZAS -->
+                <!-- CERVEZAS -->
 
                 <article
                     class="tarjeta-menu categoria-publica"
@@ -260,15 +241,13 @@
                     >
 
                     <div class="tarjeta-titulo">
-
                         <h3>Cervezas</h3>
-
                     </div>
 
                 </article>
 
 
-                <!-- CATEGORÍA DESTILADOS -->
+                <!-- BEBIDAS Y DESTILADOS -->
 
                 <article
                     class="tarjeta-menu categoria-publica"
@@ -285,9 +264,7 @@
                     >
 
                     <div class="tarjeta-titulo">
-
                         <h3>Bebidas y destilados</h3>
-
                     </div>
 
                 </article>
@@ -302,18 +279,14 @@
                 class="boton-menu-completo"
                 onclick="abrirMenuCompleto()"
             >
-
                 Consultar menú completo
                 <i class="bi bi-arrow-right"></i>
-
             </button>
 
         </section>
 
 
-        <!-- =====================================
-             VENTANA EMERGENTE DEL MENÚ
-        ====================================== -->
+        <!-- MODAL DEL MENÚ -->
 
         <div class="modal-menu-publico" id="modalMenu">
 
@@ -325,9 +298,7 @@
                     onclick="cerrarMenu()"
                     aria-label="Cerrar ventana"
                 >
-
                     <i class="bi bi-x-lg"></i>
-
                 </button>
 
 
@@ -410,9 +381,7 @@
         </div>
 
 
-        <!-- =====================================
-             GALERÍA DEL ESTABLECIMIENTO
-        ====================================== -->
+        <!-- GALERÍA DEL ESTABLECIMIENTO -->
 
         <section class="reservaciones-galeria seccion-textura"
                  id="galeria">
@@ -457,9 +426,7 @@
     </main>
 
 
-    <!-- =====================================
-         PIE DE PÁGINA
-    ====================================== -->
+    <!-- PIE DE PÁGINA -->
 
     <footer class="footer" id="contacto">
 
@@ -553,16 +520,12 @@
     </footer>
 
 
-    <!-- =====================================
-         JAVASCRIPT ORIGINAL
-    ====================================== -->
+    <!-- JAVASCRIPT ORIGINAL -->
 
     <script src="{{ url_for('static', filename='js/inicio.js') }}"></script>
 
 
-    <!-- =====================================
-         FUNCIONES DEL MENÚ PÚBLICO
-    ====================================== -->
+    <!-- FUNCIONES DEL MENÚ PÚBLICO -->
 
     <script>
 
@@ -574,9 +537,7 @@
 
         const mensajeMenuVacio = document.getElementById("mensajeMenuVacio");
 
-        const productosMenu = document.querySelectorAll(
-            ".producto-publico"
-        );
+        const productosMenu = document.querySelectorAll(".producto-publico");
 
 
         // Normalizar categorías para comparar nombres.
@@ -597,22 +558,21 @@
             const nombre = normalizarCategoria(categoria);
 
             if (tipo === "cocteles") {
-
                 return nombre.includes("coctel");
-
             }
 
             if (tipo === "cervezas") {
-
                 return nombre.includes("cerveza");
-
             }
 
             if (tipo === "destilados") {
 
                 return (
                     nombre.includes("destilado") ||
-                    nombre.includes("bebida")
+                    nombre.includes("bebida") ||
+                    nombre.includes("tradicional") ||
+                    nombre.includes("tropical") ||
+                    nombre.includes("shot")
                 );
 
             }
@@ -648,18 +608,10 @@
 
             else if (tipo === "destilados") {
 
-                return(
-                    nombre.includes("destilado") ||
-                    nombre.includes("bebida") ||
-                    nombre.includes("tradicional") ||
-                    nombre.includes("tropical") ||
-                    nombre.includes("shot")
-                );
-
                 titulo = "Bebidas y destilados";
 
                 descripcion =
-                    "Explora nuestras bebidas y destilados.";
+                    "Explora nuestras bebidas tradicionales, tropicales, shots y destilados.";
 
             }
 
@@ -680,9 +632,7 @@
                 producto.style.display = coincide ? "flex" : "none";
 
                 if (coincide) {
-
                     encontrados++;
-
                 }
 
             });
@@ -708,9 +658,7 @@
 
 
             productosMenu.forEach(producto => {
-
                 producto.style.display = "flex";
-
             });
 
 
@@ -738,9 +686,7 @@
         modalMenu.addEventListener("click", function(event) {
 
             if (event.target === modalMenu) {
-
                 cerrarMenu();
-
             }
 
         });
@@ -750,9 +696,7 @@
         document.addEventListener("keydown", function(event) {
 
             if (event.key === "Escape" && modalMenu.classList.contains("activo")) {
-
                 cerrarMenu();
-
             }
 
         });
