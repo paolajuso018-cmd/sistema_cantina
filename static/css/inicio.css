@@ -1301,3 +1301,188 @@ button, input, select {
     padding: 30px;
     color: #6b2929;
 }
+
+
+/* ==========================================
+   15. MODAL DEL MENÚ PÚBLICO
+========================================== */
+
+/* Tarjetas de categorías */
+.categoria-publica {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.categoria-publica:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* Fondo del modal */
+.modal-menu-publico {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(20, 5, 8, 0.85);
+    padding: 25px;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-menu-publico.activo {
+    display: flex;
+}
+
+/* Contenido */
+.contenido-modal-menu {
+    position: relative;
+    background: var(--marfil);
+    width: 100%;
+    max-width: 1100px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 40px;
+    border-radius: 15px;
+    border: 2px solid var(--dorado);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Botón cerrar */
+.cerrar-modal-menu {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--vino);
+    color: white;
+    font-size: 23px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.cerrar-modal-menu:hover {
+    background: var(--verde);
+}
+
+/* Título y descripción */
+.contenido-modal-menu h2 {
+    color: var(--vino);
+    font-family: Georgia, serif;
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.contenido-modal-menu > p {
+    text-align: center;
+    color: var(--cafe);
+    line-height: 1.6;
+}
+
+/* Productos */
+.productos-modal-menu {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 30px;
+}
+
+/* Tarjeta de cada receta */
+.producto-publico {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #D8C4A5;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.10);
+    transition: transform 0.3s ease;
+}
+
+.producto-publico:hover {
+    transform: translateY(-5px);
+}
+
+.producto-publico > img {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+}
+
+.informacion-producto-publico {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 18px;
+}
+
+.informacion-producto-publico h3 {
+    color: var(--vino);
+    font-family: Georgia, serif;
+    font-size: 21px;
+    margin-bottom: 10px;
+}
+
+.informacion-producto-publico p {
+    color: var(--cafe);
+    line-height: 1.6;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.precio-producto-publico {
+    color: var(--vino);
+    font-size: 21px;
+    font-weight: bold;
+    margin-top: auto;
+}
+
+/* Mensaje cuando no hay recetas */
+.mensaje-menu-vacio {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    color: var(--vino);
+    font-weight: bold;
+    grid-column: 1 / -1;
+}
+
+/* Botón de menú completo */
+.boton-menu-completo {
+    cursor: pointer;
+}
+
+/* Adaptación para tabletas */
+@media (max-width: 850px) {
+    .productos-modal-menu {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Adaptación para celulares */
+@media (max-width: 550px) {
+    .modal-menu-publico {
+        padding: 10px;
+    }
+
+    .contenido-modal-menu {
+        padding: 45px 15px 20px;
+        max-height: 95vh;
+    }
+
+    .contenido-modal-menu h2 {
+        font-size: 25px;
+    }
+
+    .productos-modal-menu {
+        grid-template-columns: 1fr;
+    }
+
+    .producto-publico > img {
+        height: 230px;
+    }
+}

@@ -24,8 +24,10 @@
     <header class="encabezado" id="inicio">
 
         <a href="#inicio" class="logo">
-            <img src="{{ url_for('static', filename='img/logo_portada.png') }}"
-                 alt="La Cantina">
+            <img
+                src="{{ url_for('static', filename='img/logo_portada.png') }}"
+                alt="La Cantina"
+            >
         </a>
 
         <button class="menu-movil" id="menuMovil" aria-label="Abrir menú">
@@ -43,12 +45,13 @@
                 </a>
 
                 <div class="submenu">
-                    <a href="#menu">Todas las bebidas</a>
+                    <a href="#cocteles">Cócteles</a>
+                    <a href="#cervezas">Cervezas</a>
+                    <a href="#destilados">Bebidas y destilados</a>
                 </div>
 
             </div>
 
-            <!-- ACCESO A RESERVACIONES -->
             <a href="{{ url_for('reservaciones.index') }}">
                 Reservaciones
             </a>
@@ -199,7 +202,7 @@
 
 
         <!-- =====================================
-             MENÚ DINÁMICO DE RECETAS
+             MENÚ PRINCIPAL POR CATEGORÍAS
         ====================================== -->
 
         <section class="menu-seccion seccion-textura" id="menu">
@@ -221,56 +224,196 @@
 
             <div class="menu-tarjetas">
 
-                {% for receta in recetas_menu %}
+                <!-- CATEGORÍA CÓCTELES -->
 
-                    <article class="tarjeta-menu receta-publica">
+                <article
+                    class="tarjeta-menu categoria-publica"
+                    id="cocteles"
+                    role="button"
+                    tabindex="0"
+                    onclick="abrirMenuCategoria('cocteles')"
+                    onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); abrirMenuCategoria('cocteles'); }"
+                >
 
-                        {% if receta.imagen %}
+                    <img
+                        src="{{ url_for('static', filename='img/cocteles.png') }}"
+                        alt="Cócteles"
+                    >
 
-                            <img
-                                src="{{ url_for('static', filename=receta.imagen) }}"
-                                alt="{{ receta.nombre }}"
-                                loading="lazy"
-                            >
+                    <div class="tarjeta-titulo">
 
-                        {% else %}
+                        <h3>Cócteles</h3>
 
-                            <img
-                                src="{{ url_for('static', filename='img/icono_bebida.png') }}"
-                                alt="Imagen no disponible"
-                                loading="lazy"
-                            >
+                    </div>
 
-                        {% endif %}
+                </article>
 
 
-                        <div class="tarjeta-titulo">
+                <!-- CATEGORÍA CERVEZAS -->
 
-                            <h3>{{ receta.nombre }}</h3>
+                <article
+                    class="tarjeta-menu categoria-publica"
+                    id="cervezas"
+                    role="button"
+                    tabindex="0"
+                    onclick="abrirMenuCategoria('cervezas')"
+                    onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); abrirMenuCategoria('cervezas'); }"
+                >
 
-                            <p>
-                                {{ receta.descripcion or 'Disfruta de esta especialidad de La Cantina.' }}
-                            </p>
+                    <img
+                        src="{{ url_for('static', filename='img/cervezas.png') }}"
+                        alt="Cervezas"
+                    >
 
-                            <span class="precio-receta">
-                                ${{ "%.2f"|format(receta.precio_venta) }}
-                            </span>
+                    <div class="tarjeta-titulo">
 
-                        </div>
+                        <h3>Cervezas</h3>
 
-                    </article>
+                    </div>
 
-                {% else %}
+                </article>
 
-                    <p class="menu-vacio">
-                        Próximamente tendremos nuestras especialidades disponibles.
-                    </p>
 
-                {% endfor %}
+                <!-- CATEGORÍA DESTILADOS -->
+
+                <article
+                    class="tarjeta-menu categoria-publica"
+                    id="destilados"
+                    role="button"
+                    tabindex="0"
+                    onclick="abrirMenuCategoria('destilados')"
+                    onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); abrirMenuCategoria('destilados'); }"
+                >
+
+                    <img
+                        src="{{ url_for('static', filename='img/destilados.png') }}"
+                        alt="Bebidas y destilados"
+                    >
+
+                    <div class="tarjeta-titulo">
+
+                        <h3>Bebidas y destilados</h3>
+
+                    </div>
+
+                </article>
 
             </div>
 
+
+            <!-- BOTÓN MENÚ COMPLETO -->
+
+            <button
+                type="button"
+                class="boton-menu-completo"
+                onclick="abrirMenuCompleto()"
+            >
+
+                Consultar menú completo
+                <i class="bi bi-arrow-right"></i>
+
+            </button>
+
         </section>
+
+
+        <!-- =====================================
+             VENTANA EMERGENTE DEL MENÚ
+        ====================================== -->
+
+        <div class="modal-menu-publico" id="modalMenu">
+
+            <div class="contenido-modal-menu">
+
+                <button
+                    type="button"
+                    class="cerrar-modal-menu"
+                    onclick="cerrarMenu()"
+                    aria-label="Cerrar ventana"
+                >
+
+                    <i class="bi bi-x-lg"></i>
+
+                </button>
+
+
+                <div class="titulo-seccion">
+
+                    <span class="adorno-titulo"></span>
+
+                    <h2 id="tituloModalMenu">Nuestro menú</h2>
+
+                    <span class="adorno-titulo"></span>
+
+                </div>
+
+
+                <p class="descripcion-seccion" id="descripcionModalMenu">
+                    Conoce nuestras bebidas y especialidades.
+                </p>
+
+
+                <!-- PRODUCTOS DINÁMICOS DE MYSQL -->
+
+                <div class="productos-modal-menu" id="productosModalMenu">
+
+                    {% for receta in recetas_menu %}
+
+                        <article
+                            class="producto-publico"
+                            data-categoria="{{ receta.categoria|lower|e }}"
+                        >
+
+                            {% if receta.imagen %}
+
+                                <img
+                                    src="{{ url_for('static', filename=receta.imagen) }}"
+                                    alt="{{ receta.nombre }}"
+                                    loading="lazy"
+                                >
+
+                            {% else %}
+
+                                <img
+                                    src="{{ url_for('static', filename='img/icono_bebida.png') }}"
+                                    alt="Imagen no disponible"
+                                    loading="lazy"
+                                >
+
+                            {% endif %}
+
+
+                            <div class="informacion-producto-publico">
+
+                                <h3>{{ receta.nombre }}</h3>
+
+                                <p>
+                                    {{ receta.descripcion or 'Disfruta de esta especialidad de La Cantina.' }}
+                                </p>
+
+                                <span class="precio-producto-publico">
+                                    ${{ "%.2f"|format(receta.precio_venta) }}
+                                </span>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <p
+                    class="mensaje-menu-vacio"
+                    id="mensajeMenuVacio"
+                >
+                    No hay productos registrados en esta categoría.
+                </p>
+
+            </div>
+
+        </div>
 
 
         <!-- =====================================
@@ -416,8 +559,203 @@
     </footer>
 
 
-    <!-- JAVASCRIPT ORIGINAL DE LA PÁGINA -->
+    <!-- =====================================
+         JAVASCRIPT ORIGINAL
+    ====================================== -->
+
     <script src="{{ url_for('static', filename='js/inicio.js') }}"></script>
+
+
+    <!-- =====================================
+         FUNCIONES DEL MENÚ PÚBLICO
+    ====================================== -->
+
+    <script>
+
+        const modalMenu = document.getElementById("modalMenu");
+
+        const tituloModalMenu = document.getElementById("tituloModalMenu");
+
+        const descripcionModalMenu = document.getElementById("descripcionModalMenu");
+
+        const mensajeMenuVacio = document.getElementById("mensajeMenuVacio");
+
+        const productosMenu = document.querySelectorAll(
+            ".producto-publico"
+        );
+
+
+        // Normalizar categorías para comparar nombres.
+        function normalizarCategoria(texto) {
+
+            return texto
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+
+        }
+
+
+        // Identificar la categoría de cada producto.
+        function perteneceCategoria(categoria, tipo) {
+
+            const nombre = normalizarCategoria(categoria);
+
+            if (tipo === "cocteles") {
+
+                return nombre.includes("coctel");
+
+            }
+
+            if (tipo === "cervezas") {
+
+                return nombre.includes("cerveza");
+
+            }
+
+            if (tipo === "destilados") {
+
+                return (
+                    nombre.includes("destilado") ||
+                    nombre.includes("bebida")
+                );
+
+            }
+
+            return false;
+
+        }
+
+
+        // Abrir una categoría específica.
+        function abrirMenuCategoria(tipo) {
+
+            let titulo = "";
+            let descripcion = "";
+
+            if (tipo === "cocteles") {
+
+                titulo = "Nuestros cócteles";
+
+                descripcion =
+                    "Descubre nuestra variedad de cócteles.";
+
+            }
+
+            else if (tipo === "cervezas") {
+
+                titulo = "Nuestras cervezas";
+
+                descripcion =
+                    "Conoce las cervezas disponibles en La Cantina.";
+
+            }
+
+            else if (tipo === "destilados") {
+
+                titulo = "Bebidas y destilados";
+
+                descripcion =
+                    "Explora nuestras bebidas y destilados.";
+
+            }
+
+
+            tituloModalMenu.textContent = titulo;
+
+            descripcionModalMenu.textContent = descripcion;
+
+            let encontrados = 0;
+
+
+            productosMenu.forEach(producto => {
+
+                const categoria = producto.dataset.categoria || "";
+
+                const coincide = perteneceCategoria(categoria, tipo);
+
+                producto.style.display = coincide ? "flex" : "none";
+
+                if (coincide) {
+
+                    encontrados++;
+
+                }
+
+            });
+
+
+            mensajeMenuVacio.style.display =
+                encontrados === 0 ? "block" : "none";
+
+            modalMenu.classList.add("activo");
+
+            document.body.style.overflow = "hidden";
+
+        }
+
+
+        // Mostrar todos los productos sin clasificación.
+        function abrirMenuCompleto() {
+
+            tituloModalMenu.textContent = "Menú completo";
+
+            descripcionModalMenu.textContent =
+                "Conoce todas nuestras bebidas y especialidades de La Cantina.";
+
+
+            productosMenu.forEach(producto => {
+
+                producto.style.display = "flex";
+
+            });
+
+
+            mensajeMenuVacio.style.display =
+                productosMenu.length === 0 ? "block" : "none";
+
+            modalMenu.classList.add("activo");
+
+            document.body.style.overflow = "hidden";
+
+        }
+
+
+        // Cerrar ventana.
+        function cerrarMenu() {
+
+            modalMenu.classList.remove("activo");
+
+            document.body.style.overflow = "";
+
+        }
+
+
+        // Cerrar al pulsar fuera del contenido.
+        modalMenu.addEventListener("click", function(event) {
+
+            if (event.target === modalMenu) {
+
+                cerrarMenu();
+
+            }
+
+        });
+
+
+        // Cerrar con Escape.
+        document.addEventListener("keydown", function(event) {
+
+            if (event.key === "Escape" && modalMenu.classList.contains("activo")) {
+
+                cerrarMenu();
+
+            }
+
+        });
+
+    </script>
 
 </body>
 </html>
