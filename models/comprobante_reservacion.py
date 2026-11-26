@@ -386,12 +386,24 @@ def enviar_correo_reservacion(destinatario, nombre, pdf_bytes):
     puerto = current_app.config.get("MAIL_PORT")
     usuario = current_app.config.get("MAIL_USERNAME")
     contrasena = current_app.config.get("MAIL_PASSWORD")
-    remitente = current_app.config.get("MAIL_DEFAULT_SENDER")
 
+    # Aceptar cualquiera de los dos nombres de configuración.
+    remitente = (
+        current_app.config.get("MAIL_FROM")
+        or current_app.config.get("MAIL_DEFAULT_SENDER")
+        or usuario
+    )
+
+    # Validar configuración.
     if not all([servidor, puerto, usuario, contrasena, remitente]):
         raise ValueError(
-            "Falta configurar el correo electrónico en el archivo .env."
+            "Faltan variables de configuración del correo."
         )
+
+    puerto = int(puerto)
+
+    if not destinatario:
+        raise ValueError("El destinatario no tiene un correo válido.")
 
     mensaje = EmailMessage()
 
@@ -413,8 +425,20 @@ def enviar_correo_reservacion(destinatario, nombre, pdf_bytes):
         filename="Comprobante_Reservacion_La_Cantina.pdf"
     )
 
-    with smtplib.SMTP(servidor, puerto) as smtp:
+    print("CONECTANDO CON SERVIDOR DE CORREO...")
 
+    with smtplib.SMTP(servidor, puerto, timeout=30) as smtp:
+
+        smtp.ehlo()
         smtp.starttls()
+        smtp.ehlo()
+
+        print("INICIANDO SESIÓN DE CORREO...")
+
         smtp.login(usuario, contrasena)
+
         smtp.send_message(mensaje)
+
+    print("CORREO ENVIADO CORRECTAMENTE A:", destinatario)
+
+    return True
